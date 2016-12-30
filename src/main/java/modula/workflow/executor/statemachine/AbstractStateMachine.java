@@ -1,4 +1,4 @@
-package modula.impl.statemachine;
+package modula.workflow.executor.statemachine;
 
 
 import modula.core.model.Modula;

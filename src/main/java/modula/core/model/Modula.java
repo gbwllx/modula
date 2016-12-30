@@ -1,6 +1,8 @@
 package modula.core.model;
 
 
+import modula.core.lifecycle.LifeCycle;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

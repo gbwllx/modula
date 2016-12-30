@@ -1,0 +1,66 @@
+<scxml xmlns="http://www.w3.org/2005/07/scxml"
+       xmlns:cs="http://www.alibaba-inc.com/2015/xfsm"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.w3.org/2005/07/scxml http://www.w3.org/2011/04/SCXML/scxml.xsd"
+       version="1.0" initial="ready">
+
+    <!-- 模拟交易流程 -->
+
+    <state id="ready">
+        <onentry>
+            <log expr="'准备就绪'" />
+        </onentry>
+        <transition event="makeOrder" target="waitBuyerPay">
+            <log expr="'买家下单'" />
+        </transition>
+    </state>
+
+    <state id="waitBuyerPay">
+        <onentry>
+            <log expr="'等待买家付款'" />
+        </onentry>
+        <transition event="buyerPay" target="waitSellerSend">
+            <log expr="'买家付款'" />
+        </transition>
+        <transition event="cancel" target="closed">
+            <log expr="'卖家关闭订单'" />
+        </transition>
+    </state>
+
+    <state id="waitSellerSend">
+        <onentry>
+            <log expr="'等待卖家发货'" />
+        </onentry>
+        <transition event="sellerSend" target="waitBuyerReceive">
+            <log expr="'卖家发货'" />
+        </transition>
+    </state>
+
+    <state id="waitBuyerReceive">
+        <onentry>
+            <log expr="'等待买家确认收货'" />
+        </onentry>
+        <transition event="buyerReceive" target="success">
+            <log expr="'买家确认收货'" />
+        </transition>
+    </state>
+
+    <state id="success">
+        <onentry>
+            <log expr="'交易成功'" />
+        </onentry>
+        <transition target="end"/>
+    </state>
+
+    <state id="closed">
+        <onentry>
+            <log expr="'交易关闭'" />
+        </onentry>
+        <transition target="end"/>
+    </state>
+
+    <final id="end" />
+
+</scxml>
+
+

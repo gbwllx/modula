@@ -1,8 +1,8 @@
-package modula.impl.statemachine;
+package modula.workflow.executor.statemachine;
 
 
 import modula.core.model.Modula;
-import modula.impl.factory.ModulaFactory;
+import modula.workflow.executor.factory.WorkflowFactory;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,7 +22,7 @@ public class StateMachineBuilder {
     /**
      * 创建Modula工厂
      */
-    private ModulaFactory modulaFactory = null;
+    private WorkflowFactory workflowFactory = null;
 
     /**
      * modula缓存
@@ -35,13 +35,13 @@ public class StateMachineBuilder {
         Modula modula = modulaCache.get();
         if (modula == null) {
             int version = modulaCache.version.get();
-            modula = modulaFactory.createModula(actions);
+            modula = workflowFactory.createModula(actions);
             modulaCache.set(version, modula);
         }
 
         DefaultStateMachine stateMachine = new DefaultStateMachine(modula);
 
-        return null;
+        return stateMachine;
     }
 
     private void verify() {

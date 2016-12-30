@@ -1,4 +1,4 @@
-package modula.impl.action;
+package modula.workflow.executor.action;
 
 import modula.core.model.Action;
 

@@ -1,4 +1,4 @@
-package modula.impl.factory;
+package modula.workflow.executor.factory;
 
 
 import modula.core.model.Modula;
@@ -11,7 +11,7 @@ import java.util.Map;
  * @author: gubing.gb
  * @date: 2016/12/30.
  */
-public interface ModulaFactory {
+public interface WorkflowFactory {
     /**
      * 创建 Modula
      *

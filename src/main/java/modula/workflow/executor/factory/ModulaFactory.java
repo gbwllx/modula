@@ -11,7 +11,7 @@ import java.util.Map;
  * @author: gubing.gb
  * @date: 2016/12/30.
  */
-public interface WorkflowFactory {
+public interface ModulaFactory {
     /**
      * 创建 Modula
      *

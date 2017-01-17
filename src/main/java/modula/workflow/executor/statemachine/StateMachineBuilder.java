@@ -2,8 +2,9 @@ package modula.workflow.executor.statemachine;
 
 
 import modula.core.model.Modula;
-import modula.workflow.executor.factory.WorkflowFactory;
+import modula.workflow.executor.factory.ModulaFactory;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,7 +23,7 @@ public class StateMachineBuilder {
     /**
      * 创建Modula工厂
      */
-    private WorkflowFactory workflowFactory = null;
+    private ModulaFactory workflowFactory = null;
 
     /**
      * modula缓存
@@ -45,6 +46,11 @@ public class StateMachineBuilder {
     }
 
     private void verify() {
+    }
+
+    public StateMachineBuilder url(URL modulaURL) {
+        this.scxmlFactory = new URLSCXMLFactory(modulaURL);
+        return this;
     }
 
     class ModulaHolder {

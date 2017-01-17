@@ -1,6 +1,5 @@
 package modula.core.model;
 
-
 import modula.core.lifecycle.LifeCycle;
 
 import java.io.Serializable;
@@ -19,6 +18,15 @@ public class Modula implements Serializable, LifeCycle {
      * Modula 版本号
      */
     private String version;
+
+    /**
+     * datamodel 可选属性
+     */
+    private Datamodel datamodel;
+    /**
+     * 自动生成TransitionTarget id 的前缀
+     */
+    public static final String GENERATED_TT_ID_PREFIX = "_generated_tt_id_";
 
     /**
      * Modula初始Transition
@@ -40,7 +48,7 @@ public class Modula implements Serializable, LifeCycle {
      */
     private String name;
 
-    public Modula(){
+    public Modula() {
         this.children = new ArrayList<EnterableState>();
         this.targets = new HashMap<String, TransitionTarget>();
     }
@@ -52,6 +60,25 @@ public class Modula implements Serializable, LifeCycle {
     public void setVersion(String version) {
         this.version = version;
     }
+
+    /**
+     * Get the data model placed at document root.
+     *
+     * @return Returns the data model.
+     */
+    public final Datamodel getDatamodel() {
+        return datamodel;
+    }
+
+    /**
+     * Set the data model at document root.
+     *
+     * @param datamodel The Datamodel to set.
+     */
+    public final void setDatamodel(final Datamodel datamodel) {
+        this.datamodel = datamodel;
+    }
+
 
     public SimpleTransition getInitialTransition() {
         return initialTransition;

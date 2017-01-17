@@ -1,8 +1,4 @@
-<scxml xmlns="http://www.w3.org/2005/07/scxml"
-       xmlns:cs="http://www.alibaba-inc.com/2015/xfsm"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.w3.org/2005/07/scxml http://www.w3.org/2011/04/SCXML/scxml.xsd"
-       version="1.0" initial="ready">
+<modula version="1.0" initial="ready">
 
     <!-- 模拟交易流程 -->
 
@@ -61,6 +57,6 @@
 
     <final id="end" />
 
-</scxml>
+</modula>
 
 

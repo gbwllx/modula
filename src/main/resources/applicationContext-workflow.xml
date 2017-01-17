@@ -18,7 +18,7 @@
     <bean id="registry" class="modula.workflow.registry.DefaultStateMachineRegistry">
     </bean>
 
-    <bean id="workflow" class="modula.workflow.engine.factory.WorkflowSpringFactoryBean">
+    <bean id="modula" class="modula.workflow.engine.factory.WorkflowSpringFactoryBean">
         <property name="path" value="modula/workflow.xml"/>
         <property name="action">
             <map>

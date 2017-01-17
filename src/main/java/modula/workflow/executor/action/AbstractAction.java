@@ -7,5 +7,5 @@ import modula.core.model.Action;
  * @author: gubing.gb
  * @date: 2016/12/29.
  */
-public class AbstractAction implements Action {
+public class AbstractAction extends Action {
 }

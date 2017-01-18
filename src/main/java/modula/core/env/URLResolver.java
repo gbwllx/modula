@@ -16,6 +16,7 @@
  */
 package modula.core.env;
 
+import modula.core.PathResolver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

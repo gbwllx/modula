@@ -2,8 +2,11 @@ package modula.workflow.executor.context;
 
 import modula.workflow.executor.statemachine.StateMachine;
 import modula.workflow.executor.statemachine.StateMachineBuilder;
+import modula.workflow.listener.DefaultWorkflowListener;
 
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @description:
@@ -35,5 +38,13 @@ public class StateMachineBuildContext {
 
     public void setModulaURL(URL modulaURL) {
         builder.url(modulaURL);
+    }
+
+    public void setActions(Map<String,Class> actions) {
+        builder.setActions(actions);
+    }
+
+    public void setListeners(List<DefaultWorkflowListener> listeners) {
+        this.builder.setListeners(listeners);
     }
 }

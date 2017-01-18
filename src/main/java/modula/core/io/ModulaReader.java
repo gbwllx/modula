@@ -1,5 +1,6 @@
 package modula.core.io;
 
+import modula.core.PathResolver;
 import modula.core.env.URLResolver;
 import modula.core.model.CustomAction;
 import modula.core.model.ModelException;

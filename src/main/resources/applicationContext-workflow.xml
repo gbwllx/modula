@@ -15,15 +15,20 @@
         </property>
     </bean>
 
-    <bean id="registry" class="modula.workflow.registry.DefaultStateMachineRegistry">
+    <bean id="registry" class="modula.workflow.register.DefaultStateMachineRegistry">
     </bean>
 
-    <bean id="modula" class="modula.workflow.engine.factory.WorkflowSpringFactoryBean">
+    <bean id="modula" class="modula.workflow.executor.factory.WorkflowSpringFactoryBean">
         <property name="path" value="modula/workflow.xml"/>
         <property name="action">
             <map>
-                <entry key="defaltAction" value="modula.workflow.engine.DefaultAction"/>
+                <entry key="calc">
+                    <value type="java.lang.Class">com.alibaba.shared.xfsm.example.helloworld.CalcAction</value>
+                </entry>
             </map>
+        </property>
+        <property name="listener">
+            <bean class="com.alibaba.shared.xfsm.core.listener.SimpleXFSMListener"/>
         </property>
     </bean>
 

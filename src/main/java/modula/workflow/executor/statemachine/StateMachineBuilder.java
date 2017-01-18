@@ -3,8 +3,11 @@ package modula.workflow.executor.statemachine;
 
 import modula.core.model.Modula;
 import modula.workflow.executor.factory.ModulaFactory;
+import modula.workflow.listener.DefaultWorkflowListener;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,6 +22,11 @@ public class StateMachineBuilder {
      * 状态机绑定的组件action
      */
     private Map<String, Class> actions = null;
+
+    /**
+     * 状态机监听器
+     */
+    private List<DefaultWorkflowListener> listeners = null;
 
     /**
      * 创建Modula工厂
@@ -49,7 +57,25 @@ public class StateMachineBuilder {
     }
 
     public StateMachineBuilder url(URL modulaURL) {
-        this.scxmlFactory = new URLSCXMLFactory(modulaURL);
+        //this.scxmlFactory = new URLSCXMLFactory(modulaURL);
+        return this;
+    }
+
+    public StateMachineBuilder setActions(Map<String, Class> actions) {
+        this.actions = actions;
+        return this;
+    }
+
+    public StateMachineBuilder addAction(String key, Class clazz) {
+        if (actions == null) {
+            actions = new HashMap<String, Class>();
+        }
+        actions.put(key, clazz);
+        return this;
+    }
+
+    public StateMachineBuilder setListeners(List<DefaultWorkflowListener> listeners) {
+        this.listeners = listeners;
         return this;
     }
 

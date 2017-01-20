@@ -6,18 +6,12 @@ package modula.core;
 public interface PathResolver {
 
     /**
-     * Resolve this context sensitive path to an absolute URL.
-     *
-     * @param ctxPath Context sensitive path, can be a relative URL
-     * @return Resolved path (an absolute URL) or <code>null</code>
+     * 解析ctxPath到绝对路径URL
      */
     String resolvePath(String ctxPath);
 
     /**
-     * Get a PathResolver rooted at this context sensitive path.
-     *
-     * @param ctxPath Context sensitive path, can be a relative URL
-     * @return Returns a new resolver rooted at ctxPath
+     * 获取以ctxPath为根的PathResolver
      */
     PathResolver getResolver(String ctxPath);
 

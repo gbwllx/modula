@@ -25,8 +25,7 @@ public class Param implements NamespacePrefixesHolder, Serializable {
     private String expr;
 
     /**
-     * The current XML namespaces in the SCXML document for this action node,
-     * preserved for deferred XPath evaluation.
+     * Modula文档定义的action的命名空间
      */
     private Map<String, String> namespaces;
 

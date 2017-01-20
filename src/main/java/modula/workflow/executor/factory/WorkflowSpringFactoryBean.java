@@ -21,12 +21,12 @@ public class WorkflowSpringFactoryBean extends AbstractFactoryBean {
 
     @Override
     public Class<?> getObjectType() {
-        return StateMachine.class;
+        return StateMachineBuildContext.class;
     }
 
     @Override
-    protected StateMachine createInstance() throws Exception {
-        return buildContext.createStateMachine();
+    protected StateMachineBuildContext createInstance() throws Exception {
+        return buildContext;
     }
 
     public void setPath(String modulaPath) {

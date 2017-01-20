@@ -2,9 +2,7 @@ package modula.core.io;
 
 import modula.core.PathResolver;
 import modula.core.env.URLResolver;
-import modula.core.model.CustomAction;
-import modula.core.model.ModelException;
-import modula.core.model.Modula;
+import modula.core.model.*;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
@@ -32,6 +30,17 @@ import java.util.*;
 public final class ModulaReader {
     private static final String MODULA_REQUIRED_VERSION = "1.0";
 
+    /**
+     * Modula命名空间
+     */
+    private static final String XMLNS_MODULA =
+            "http://localhost/2017/01/modula";
+
+    /**
+     * 默认命名空间
+     */
+    private static final String XMLNS_DEFAULT = null;
+
     //---- ERROR MESSAGES ----//
     /**
      * 空URL
@@ -43,53 +52,53 @@ public final class ModulaReader {
      */
     private static final String ERR_NULL_PATH = "Cannot parse null path";
 
+//    /**
+//     * 空InputStream
+//     */
+//    private static final String ERR_NULL_ISTR = "Cannot parse null InputStream";
+//
+//    /**
+//     * 空Reader
+//     */
+//    private static final String ERR_NULL_READ = "Cannot parse null Reader";
+//
+//    /**
+//     * 空Source
+//     */
+//    private static final String ERR_NULL_SRC = "Cannot parse null Source";
+//
+//    /**
+//     * Action定义错误
+//     */
+//    private static final String ERR_CUSTOM_ACTION_TYPE = "Custom actions list"
+//            + " contained unknown object, class not a Commons Modula Action class subtype: ";
+//
+//    /**
+//     * 解析DOM树错误
+//     */
+//    private static final String ERR_PARSER_CFG = "ParserConfigurationException while trying"
+//            + " to parse stream into DOM node(s).";
+//
+//    /**
+//     * 找不到定义文档
+//     */
+//    private static final String ERR_STATE_SRC =
+//            "Source attribute in <state src=\"{0}\"> cannot be parsed";
+//
+//    /**
+//     * 未知的state
+//     */
+//    private static final String ERR_STATE_SRC_FRAGMENT = "URI Fragment in "
+//            + "<state src=\"{0}\"> is an unknown state in referenced document";
+//
+//    /**
+//     * state的src指向非state或final
+//     */
+//    private static final String ERR_STATE_SRC_FRAGMENT_TARGET = "URI Fragment"
+//            + " in <state src=\"{0}\"> does not point to a <state> or <final>";
+//
     /**
-     * 空InputStream
-     */
-    private static final String ERR_NULL_ISTR = "Cannot parse null InputStream";
-
-    /**
-     * 空Reader
-     */
-    private static final String ERR_NULL_READ = "Cannot parse null Reader";
-
-    /**
-     * 空Source
-     */
-    private static final String ERR_NULL_SRC = "Cannot parse null Source";
-
-    /**
-     * Action定义错误
-     */
-    private static final String ERR_CUSTOM_ACTION_TYPE = "Custom actions list"
-            + " contained unknown object, class not a Commons Modula Action class subtype: ";
-
-    /**
-     * 解析DOM树错误
-     */
-    private static final String ERR_PARSER_CFG = "ParserConfigurationException while trying"
-            + " to parse stream into DOM node(s).";
-
-    /**
-     * 找不到定义文档
-     */
-    private static final String ERR_STATE_SRC =
-            "Source attribute in <state src=\"{0}\"> cannot be parsed";
-
-    /**
-     * 未知的state
-     */
-    private static final String ERR_STATE_SRC_FRAGMENT = "URI Fragment in "
-            + "<state src=\"{0}\"> is an unknown state in referenced document";
-
-    /**
-     * state的src指向非state或final
-     */
-    private static final String ERR_STATE_SRC_FRAGMENT_TARGET = "URI Fragment"
-            + " in <state src=\"{0}\"> does not point to a <state> or <final>";
-
-    /**
-     *
+     * 必填属性缺失
      */
     private static final String ERR_REQUIRED_ATTRIBUTE_MISSING = "<{0}> is missing"
             + " required attribute \"{1}\" value at {2}";
@@ -121,54 +130,23 @@ public final class ModulaReader {
 
     //--------------------------- XML VOCABULARY ---------------------------//
     //---- ELEMENT NAMES ----//
-    private static final String ELEM_ASSIGN = "assign";
-    private static final String ELEM_CANCEL = "cancel";
-    private static final String ELEM_CONTENT = "content";
-    private static final String ELEM_DATA = "data";
-    private static final String ELEM_DATAMODEL = "datamodel";
-    private static final String ELEM_ELSE = "else";
-    private static final String ELEM_ELSEIF = "elseif";
-    private static final String ELEM_RAISE = "raise";
     private static final String ELEM_FINAL = "final";
-    private static final String ELEM_FINALIZE = "finalize";
-    private static final String ELEM_HISTORY = "history";
-    private static final String ELEM_IF = "if";
     private static final String ELEM_INITIAL = "initial";
-    private static final String ELEM_INVOKE = "invoke";
-    private static final String ELEM_FOREACH = "foreach";
     private static final String ELEM_LOG = "log";
     private static final String ELEM_ONENTRY = "onentry";
     private static final String ELEM_ONEXIT = "onexit";
-    private static final String ELEM_PARALLEL = "parallel";
-    private static final String ELEM_PARAM = "param";
-    private static final String ELEM_SCRIPT = "script";
-    private static final String ELEM_Modula = "modula";
-    private static final String ELEM_SEND = "send";
+    private static final String ELEM_MODULA = "modula";
     private static final String ELEM_STATE = "state";
     private static final String ELEM_TRANSITION = "transition";
-    private static final String ELEM_VAR = "var";
 
     //---- ATTRIBUTE NAMES ----//
-    private static final String ATTR_ARRAY = "array";
-    private static final String ATTR_AUTOFORWARD = "autoforward";
     private static final String ATTR_COND = "cond";
-    private static final String ATTR_DELAY = "delay";
     private static final String ATTR_EVENT = "event";
-    private static final String ATTR_EXMODE = "exmode";
     private static final String ATTR_EXPR = "expr";
-    private static final String ATTR_HINTS = "hints";
     private static final String ATTR_ID = "id";
-    private static final String ATTR_INDEX = "index";
     private static final String ATTR_INITIAL = "initial";
-    private static final String ATTR_ITEM = "item";
     private static final String ATTR_LABEL = "label";
-    private static final String ATTR_LOCATION = "location";
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_NAMELIST = "namelist";
-    private static final String ATTR_PROFILE = "profile";
-    private static final String ATTR_SENDID = "sendid";
-    private static final String ATTR_SRC = "src";
-    private static final String ATTR_SRCEXPR = "srcexpr";
+    //;private static final String ATTR_SRC = "src";
     private static final String ATTR_TARGET = "target";
     private static final String ATTR_TYPE = "type";
     private static final String ATTR_VERSION = "version";
@@ -179,71 +157,11 @@ public final class ModulaReader {
      */
 
     /**
-     * Parse the Modula document at the supplied path.
+     * 使用{@link Configuration}解析Modula文档，{@link URL}
      *
-     * @param modulaPath The real path to the Modula document.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document.
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
-     */
-    public static Modula read(final String modulaPath)
-            throws IOException, ModelException, XMLStreamException {
-
-        return read(modulaPath, new Configuration());
-    }
-
-    /**
-     * Parse the Modula document at the supplied path with the given {@link Configuration}.
-     *
-     * @param modulaPath    The real path to the Modula document.
-     * @param configuration The {@link Configuration} to use when parsing the Modula document.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document.
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
-     */
-    public static Modula read(final String modulaPath, final Configuration configuration)
-            throws IOException, ModelException, XMLStreamException {
-
-        if (modulaPath == null) {
-            throw new IllegalArgumentException(ERR_NULL_PATH);
-        }
-        Modula modula = readInternal(configuration, null, modulaPath, null, null, null);
-        if (modula != null) {
-            //ModelUpdater.updateModula(modula);
-        }
-        return modula;
-    }
-
-    /**
-     * Parse the Modula document at the supplied {@link URL}.
-     *
-     * @param modulaURL The Modula document {@link URL} to parse.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document.
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
-     */
-    public static Modula read(final URL modulaURL)
-            throws IOException, ModelException, XMLStreamException {
-
-        return read(modulaURL, new Configuration());
-    }
-
-    /**
-     * Parse the Modula document at the supplied {@link URL} with the given {@link Configuration}.
-     *
-     * @param modulaURL     The Modula document {@link URL} to parse.
-     * @param configuration The {@link Configuration} to use when parsing the Modula document.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document.
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
+     * @param modulaURL     {@link URL}
+     * @param configuration {@link Configuration}
+     * @return Modula
      */
     public static Modula read(final URL modulaURL, final Configuration configuration)
             throws IOException, ModelException, XMLStreamException {
@@ -253,47 +171,7 @@ public final class ModulaReader {
         }
         Modula modula = readInternal(configuration, modulaURL, null, null, null, null);
         if (modula != null) {
-            //ModelUpdater.updateModula(modula);
-        }
-        return modula;
-    }
-
-    /**
-     * Parse the Modula document supplied by the given {@link InputStream}.
-     *
-     * @param modulaStream The {@link InputStream} supplying the Modula document to parse.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document.
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
-     */
-    public static Modula read(final InputStream modulaStream)
-            throws IOException, ModelException, XMLStreamException {
-
-        return read(modulaStream, new Configuration());
-    }
-
-    /**
-     * Parse the Modula document supplied by the given {@link InputStream} with the given {@link Configuration}.
-     *
-     * @param modulaStream  The {@link InputStream} supplying the Modula document to parse.
-     * @param configuration The {@link Configuration} to use when parsing the Modula document.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document.
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
-     */
-    public static Modula read(final InputStream modulaStream, final Configuration configuration)
-            throws IOException, ModelException, XMLStreamException {
-
-        if (modulaStream == null) {
-            throw new IllegalArgumentException(ERR_NULL_ISTR);
-        }
-        Modula modula = readInternal(configuration, null, null, modulaStream, null, null);
-        if (modula != null) {
-            //ModelUpdater.updateModula(modula);
+            ModelUpdater.updateModula(modula);
         }
         return modula;
     }
@@ -301,22 +179,9 @@ public final class ModulaReader {
     //---------------------- PRIVATE UTILITY METHODS ----------------------//
 
     /**
-     * Parse the Modula document at the supplied {@link URL} using the supplied {@link Configuration}, but do not
-     * wire up the object model to be usable just yet. Exactly one of the url, path, stream, reader or source
-     * parameters must be provided.
+     * 解析Modula文档
      *
-     * @param configuration The {@link Configuration} to use when parsing the Modula document.
-     * @param modulaURL     The optional Modula document {@link URL} to parse.
-     * @param modulaPath    The optional real path to the Modula document as a string.
-     * @param modulaStream  The optional {@link InputStream} providing the Modula document.
-     * @param modulaReader  The optional {@link Reader} providing the Modula document.
-     * @param modulaSource  The optional {@link Source} providing the Modula document.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document
-     * (not wired up to be immediately usable).
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
+     * @return Modula
      */
     private static Modula readInternal(final Configuration configuration, final URL modulaURL, final String modulaPath,
                                        final InputStream modulaStream, final Reader modulaReader, final Source modulaSource)
@@ -335,21 +200,8 @@ public final class ModulaReader {
         return readDocument(reader, configuration);
     }
 
-    /*
-     * Private utility functions for reading the Modula document.
-     */
-
     /**
-     * Read the Modula document through the {@link XMLStreamReader}.
-     *
-     * @param reader        The {@link XMLStreamReader} providing the Modula document to parse.
-     * @param configuration The {@link Configuration} to use while parsing.
-     * @return The parsed output, the Commons Modula object model corresponding to the Modula document
-     * (not wired up to be immediately usable).
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
+     * 通过{@link XMLStreamReader}解析文档
      */
     private static Modula readDocument(final XMLStreamReader reader, final Configuration configuration)
             throws IOException, ModelException, XMLStreamException {
@@ -362,7 +214,7 @@ public final class ModulaReader {
                     pushNamespaces(reader, configuration);
                     nsURI = reader.getNamespaceURI();
                     name = reader.getLocalName();
-                    if (ELEM_Modula.equals(name)) {
+                    if (ELEM_MODULA.equals(name)) {
                         readModula(reader, configuration, modula);
                     } else {
                         reportIgnoredElement(reader, configuration, "DOCUMENT_ROOT", nsURI, name);
@@ -378,80 +230,391 @@ public final class ModulaReader {
     }
 
     /**
-     * Read the contents of this &lt;modula&gt; element.
-     *
-     * @param reader        The {@link XMLStreamReader} providing the Modula document to parse.
-     * @param configuration The {@link Configuration} to use while parsing.
-     * @param modula        The root of the object model being parsed.
-     * @throws IOException        An IO error during parsing.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
+     * 解析modula内容
      */
     private static void readModula(final XMLStreamReader reader, final Configuration configuration, final Modula modula)
             throws IOException, ModelException, XMLStreamException {
-
+        modula.setInitial(readAV(reader, ATTR_INITIAL));
+        modula.setVersion(readRequiredAV(reader, ELEM_MODULA, ATTR_VERSION));
         if (!MODULA_REQUIRED_VERSION.equals(modula.getVersion())) {
             throw new ModelException(new MessageFormat(ERR_INVALID_VERSION).format(new Object[]{modula.getVersion()}));
         }
-        //readNamespaces(configuration, modula);
+        readNamespaces(configuration, modula);
 
-        boolean hasGlobalScript = false;
+        loop:
+        while (reader.hasNext()) {
+            String name, nsURI;
+            int next = reader.next();
+            switch (next) {
+                case XMLStreamConstants.START_ELEMENT:
+                    pushNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI)) {
+                        if (ELEM_STATE.equals(name)) {
+                            readState(reader, configuration, modula, null);
+                        } else if (ELEM_FINAL.equals(name)) {
+                            readFinal(reader, configuration, modula, null);
+                        } else {
+                            reportIgnoredElement(reader, configuration, ELEM_MODULA, nsURI, name);
+                        }
+                    } else {
+                        reportIgnoredElement(reader, configuration, ELEM_MODULA, nsURI, name);
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    popNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI) && ELEM_MODULA.equals(name)) {
+                        break loop;
+                    }
+                    break;
+                default:
+            }
+        }
+    }
 
-//        loop:
-//        while (reader.hasNext()) {
-//            String name, nsURI;
-//            switch (reader.next()) {
-//                case XMLStreamConstants.START_ELEMENT:
-//                    pushNamespaces(reader, configuration);
-//                    nsURI = reader.getNamespaceURI();
-//                    name = reader.getLocalName();
-//                    if (XMLNS_Modula.equals(nsURI)) {
-//                        if (ELEM_STATE.equals(name)) {
-//                            readState(reader, configuration, modula, null);
-//                        } else if (ELEM_PARALLEL.equals(name)) {
-//                            readParallel(reader, configuration, modula, null);
-//                        } else if (ELEM_FINAL.equals(name)) {
-//                            readFinal(reader, configuration, modula, null);
-//                        } else if (ELEM_DATAMODEL.equals(name)) {
-//                            readDatamodel(reader, configuration, modula, null);
-//                        } else if (ELEM_SCRIPT.equals(name) && !hasGlobalScript) {
-//                            readGlobalScript(reader, configuration, modula);
-//                            hasGlobalScript = true;
-//                        } else {
-//                            reportIgnoredElement(reader, configuration, ELEM_Modula, nsURI, name);
-//                        }
-//                    } else {
-//                        reportIgnoredElement(reader, configuration, ELEM_Modula, nsURI, name);
-//                    }
-//                    break;
-//                case XMLStreamConstants.END_ELEMENT:
-//                    popNamespaces(reader, configuration);
-//                    nsURI = reader.getNamespaceURI();
-//                    name = reader.getLocalName();
-//                    if (XMLNS_Modula.equals(nsURI) && ELEM_Modula.equals(name)) {
-//                        break loop;
-//                    }
-//                    break;
-//                default:
-//            }
-//        }
+    /**
+     * 解析state内容
+     */
+    private static void readState(final XMLStreamReader reader, final Configuration configuration, final Modula modula,
+                                  final TransitionalState parent)
+            throws IOException, ModelException, XMLStreamException {
+
+        State state = new State();
+        state.setId(readOrGeneratedTransitionTargetId(reader, modula, ELEM_STATE));
+        String initial = readAV(reader, ATTR_INITIAL);
+        if (initial != null) {
+            state.setFirst(initial);
+        }
+
+        if (parent == null) {
+            modula.addChild(state);
+        } else if (parent instanceof State) {//混合状态，保留
+            ((State) parent).addChild(state);
+        }
+        modula.addTarget(state);
+        if (configuration.parent != null) {
+            configuration.parent.addTarget(state);
+        }
+
+        loop:
+        while (reader.hasNext()) {
+            String name, nsURI;
+            switch (reader.next()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    pushNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI)) {
+                        if (ELEM_TRANSITION.equals(name)) {
+                            state.addTransition(readTransition(reader, configuration));
+                        } else if (ELEM_STATE.equals(name)) {//混合state，目前没有这种情况，但先保留
+                            readState(reader, configuration, modula, state);
+                        } else if (ELEM_INITIAL.equals(name)) {
+                            readInitial(reader, configuration, state);
+                        } else if (ELEM_FINAL.equals(name)) {
+                            readFinal(reader, configuration, modula, state);
+                        } else if (ELEM_ONENTRY.equals(name)) {
+                            readOnEntry(reader, configuration, state);
+                        } else if (ELEM_ONEXIT.equals(name)) {
+                            readOnExit(reader, configuration, state);
+                        } else {
+                            reportIgnoredElement(reader, configuration, ELEM_STATE, nsURI, name);
+                        }
+                    } else {
+                        reportIgnoredElement(reader, configuration, ELEM_STATE, nsURI, name);
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    popNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI) && ELEM_STATE.equals(name)) {
+                        break loop;
+                    }
+                    break;
+                default:
+            }
+        }
+    }
+
+    private static Transition readTransition(final XMLStreamReader reader, final Configuration configuration)
+            throws XMLStreamException, ModelException {
+
+        Transition transition = new Transition();
+        transition.setCond(readAV(reader, ATTR_COND));
+        transition.setEvent(readAV(reader, ATTR_EVENT));
+        transition.setNext(readAV(reader, ATTR_TARGET));
+        String type = readAV(reader, ATTR_TYPE);
+        if (type != null) {
+            try {
+                transition.setType(TransitionType.valueOf(type));
+            } catch (IllegalArgumentException e) {
+                MessageFormat msgFormat = new MessageFormat(ERR_UNSUPPORTED_TRANSITION_TYPE);
+                String errMsg = msgFormat.format(new Object[]{type, reader.getLocation()});
+                throw new ModelException(errMsg);
+            }
+        }
+
+        readNamespaces(configuration, transition);
+        readExecutableContext(reader, configuration, transition);
+
+        return transition;
+    }
+
+    private static void readInitial(final XMLStreamReader reader, final Configuration configuration,
+                                    final State state)
+            throws XMLStreamException, ModelException {
+
+        Initial initial = new Initial();
+
+        loop:
+        while (reader.hasNext()) {
+            String name, nsURI;
+            switch (reader.next()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    pushNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI)) {
+                        if (ELEM_TRANSITION.equals(name)) {
+                            initial.setTransition(readSimpleTransition(reader, configuration));
+                        } else {
+                            reportIgnoredElement(reader, configuration, ELEM_INITIAL, nsURI, name);
+                        }
+                    } else {
+                        reportIgnoredElement(reader, configuration, ELEM_INITIAL, nsURI, name);
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    popNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI) && ELEM_INITIAL.equals(name)) {
+                        break loop;
+                    }
+                    break;
+                default:
+            }
+        }
+
+        state.setInitial(initial);
+    }
+
+    private static SimpleTransition readSimpleTransition(final XMLStreamReader reader, final Configuration configuration)
+            throws XMLStreamException, ModelException {
+
+        SimpleTransition transition = new SimpleTransition();
+        transition.setNext(readAV(reader, ATTR_TARGET));
+        String type = readAV(reader, ATTR_TYPE);
+        if (type != null) {
+            try {
+                transition.setType(TransitionType.valueOf(type));
+            } catch (IllegalArgumentException e) {
+                MessageFormat msgFormat = new MessageFormat(ERR_UNSUPPORTED_TRANSITION_TYPE);
+                String errMsg = msgFormat.format(new Object[]{type, reader.getLocation()});
+                throw new ModelException(errMsg);
+            }
+        }
+
+        readNamespaces(configuration, transition);
+        readExecutableContext(reader, configuration, transition);
+
+        return transition;
     }
 
 
+    /**
+     * 解析Final
+     */
+    private static void readFinal(final XMLStreamReader reader, final Configuration configuration, final Modula modula,
+                                  final State parent)
+            throws XMLStreamException, ModelException, IOException {
+
+        Final end = new Final();
+        end.setId(readOrGeneratedTransitionTargetId(reader, modula, ELEM_FINAL));
+
+        if (parent == null) {
+            modula.addChild(end);
+        } else {
+            parent.addChild(end);
+        }
+
+        modula.addTarget(end);
+        if (configuration.parent != null) {
+            configuration.parent.addTarget(end);
+        }
+
+        loop:
+        while (reader.hasNext()) {
+            String name, nsURI;
+            switch (reader.next()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    pushNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI)) {
+                        if (ELEM_ONENTRY.equals(name)) {
+                            readOnEntry(reader, configuration, end);
+                        } else if (ELEM_ONEXIT.equals(name)) {
+                            readOnExit(reader, configuration, end);
+                        } else {
+                            reportIgnoredElement(reader, configuration, ELEM_FINAL, nsURI, name);
+                        }
+                    } else {
+                        reportIgnoredElement(reader, configuration, ELEM_FINAL, nsURI, name);
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    popNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI) && ELEM_FINAL.equals(name)) {
+                        break loop;
+                    }
+                    break;
+                default:
+            }
+        }
+    }
+
+    private static void readOnExit(final XMLStreamReader reader, final Configuration configuration,
+                                   final EnterableState es)
+            throws XMLStreamException, ModelException {
+
+        OnExit onexit = new OnExit();
+        onexit.setRaiseEvent(readBooleanAV(reader, ELEM_ONEXIT, ATTR_EVENT));
+        readExecutableContext(reader, configuration, onexit);
+        es.addOnExit(onexit);
+    }
+
+    private static void readOnEntry(final XMLStreamReader reader, final Configuration configuration,
+                                    final EnterableState es)
+            throws XMLStreamException, ModelException {
+
+        OnEntry onentry = new OnEntry();
+        onentry.setRaiseEvent(readBooleanAV(reader, ELEM_ONENTRY, ATTR_EVENT));
+        readExecutableContext(reader, configuration, onentry);
+        es.addOnEntry(onentry);
+    }
+
+    private static void readExecutableContext(final XMLStreamReader reader, final Configuration configuration,
+                                              final Executable executable)
+            throws XMLStreamException, ModelException {
+
+        String end = "";
+
+        if (executable instanceof SimpleTransition) {
+            end = ELEM_TRANSITION;
+        } else if (executable instanceof OnEntry) {
+            end = ELEM_ONENTRY;
+        } else if (executable instanceof OnExit) {
+            end = ELEM_ONEXIT;
+        }
+
+        loop:
+        while (reader.hasNext()) {
+            String name, nsURI;
+            switch (reader.next()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    pushNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI)) {
+                        if (ELEM_LOG.equals(name)) {
+                            readLog(reader, configuration, executable);
+                        } else {
+                            reportIgnoredElement(reader, configuration, end, nsURI, name);
+                        }
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    popNamespaces(reader, configuration);
+                    nsURI = reader.getNamespaceURI();
+                    name = reader.getLocalName();
+                    if (XMLNS_MODULA.equals(nsURI) && end.equals(name)) {
+                        break loop;
+                    }
+                    break;
+                default:
+            }
+        }
+    }
+
+    private static void readLog(final XMLStreamReader reader, final Configuration configuration,
+                                final Executable executable)
+            throws XMLStreamException {
+
+        Log log = new Log();
+        log.setExpr(readAV(reader, ATTR_EXPR));
+        log.setLabel(readAV(reader, ATTR_LABEL));
+        readNamespaces(configuration, log);
+        log.setParent(executable);
+
+        executable.addAction(log);
+
+    }
+
+    private static String nullIfEmpty(String input) {
+        return input == null || input.trim().length() == 0 ? null : input.trim();
+    }
 
     /**
-     * Report an ignored element via the {@link XMLReporter} if available and the class
-     * {@link org.apache.commons.logging.Log}.
-     *
-     * @param reader        The {@link XMLStreamReader} providing the Modula document to parse.
-     * @param configuration The {@link Configuration} to use while parsing.
-     * @param parent        The parent element local name in the Modula namespace.
-     * @param nsURI         The namespace URI of the ignored element.
-     * @param name          The local name of the ignored element.
-     * @throws XMLStreamException An exception processing the underlying {@link XMLStreamReader}.
-     * @throws ModelException     The Commons Modula object model is incomplete or inconsistent (includes
-     *                            errors in the Modula document that may not be identified by the schema).
+     * 读取属性值
+     */
+    private static String readAV(final XMLStreamReader reader, final String attrLocalName) {
+        return nullIfEmpty(reader.getAttributeValue(XMLNS_DEFAULT, attrLocalName));
+    }
+
+    private static Boolean readBooleanAV(final XMLStreamReader reader, final String elementName,
+                                         final String attrLocalName)
+            throws ModelException {
+        String value = nullIfEmpty(reader.getAttributeValue(XMLNS_DEFAULT, attrLocalName));
+        Boolean result = "true".equals(value) ? Boolean.TRUE : "false".equals(value) ? Boolean.FALSE : null;
+        if (result == null && value != null) {
+            MessageFormat msgFormat = new MessageFormat(ERR_ATTRIBUTE_NOT_BOOLEAN);
+            String errMsg = msgFormat.format(new Object[]{value, attrLocalName, elementName, reader.getLocation()});
+            throw new ModelException(errMsg);
+        }
+        return result;
+    }
+
+    /**
+     * 读取必填属性值
+     */
+    private static String readRequiredAV(final XMLStreamReader reader, final String elementName, final String attrLocalName)
+            throws ModelException {
+        String value = nullIfEmpty(reader.getAttributeValue(XMLNS_DEFAULT, attrLocalName));
+        if (value == null) {
+            MessageFormat msgFormat = new MessageFormat(ERR_REQUIRED_ATTRIBUTE_MISSING);
+            String errMsg = msgFormat.format(new Object[]{elementName, attrLocalName, reader.getLocation()});
+            throw new ModelException(errMsg);
+        }
+        return value;
+    }
+
+    private static String readOrGeneratedTransitionTargetId(final XMLStreamReader reader, final Modula modula,
+                                                            final String elementName)
+            throws ModelException {
+        String id = readAV(reader, ATTR_ID);
+        if (id == null) {
+            id = modula.generateTransitionTargetId();
+        } else if (id.startsWith(Modula.GENERATED_TT_ID_PREFIX)) {
+            MessageFormat msgFormat = new MessageFormat(ERR_RESERVED_ID_PREFIX);
+            String errMsg = msgFormat.format(new Object[]{elementName, id, reader.getLocation()});
+            throw new ModelException(errMsg);
+        }
+        return id;
+    }
+
+    private static void readNamespaces(final Configuration configuration, final NamespacePrefixesHolder holder) {
+        holder.setNamespaces(configuration.getCurrentNamespaces());
+    }
+
+    /**
+     * 通过{@link XMLReporter}上报未知元素
      */
     private static void reportIgnoredElement(final XMLStreamReader reader, final Configuration configuration,
                                              final String parent, final String nsURI, final String name)
@@ -476,10 +639,10 @@ public final class ModulaReader {
     }
 
     /**
-     * Push any new namespace declarations on the configuration namespaces map.
+     * 命名空间 入栈
      *
-     * @param reader        The {@link XMLStreamReader} providing the Modula document to parse.
-     * @param configuration The {@link Configuration} to use while parsing.
+     * @param reader
+     * @param configuration
      */
     private static void pushNamespaces(final XMLStreamReader reader, final Configuration configuration) {
 
@@ -520,19 +683,7 @@ public final class ModulaReader {
     }
 
     /**
-     * Use the supplied {@link Configuration} to create an appropriate {@link XMLStreamReader} for this
-     * {@link ModulaReader}. Exactly one of the url, path, stream, reader or source parameters must be provided.
-     *
-     * @param configuration The {@link Configuration} to be used.
-     * @param url           The {@link URL} to the Modula document to read.
-     * @param path          The optional real path to the Modula document as a string.
-     * @param stream        The optional {@link InputStream} providing the Modula document.
-     * @param reader        The optional {@link Reader} providing the Modula document.
-     * @param source        The optional {@link Source} providing the Modula document.
-     * @return The appropriately configured {@link XMLStreamReader}.
-     * @throws IOException        Exception with the URL IO.
-     * @throws XMLStreamException A problem with the XML stream creation or an wrapped {@link SAXException}
-     *                            thrown in trying to validate the document against the XML Schema for Modula.
+     * 创建{@link XMLStreamReader} 实例
      */
     private static XMLStreamReader getReader(final Configuration configuration, final URL url, final String path,
                                              final InputStream stream, final Reader reader, final Source source)
@@ -640,146 +791,115 @@ public final class ModulaReader {
     //------------------------- CONFIGURATION CLASS -------------------------//
 
     /**
-     * <p>
-     * Configuration for the {@link ModulaReader}. The configuration properties necessary for the following are
-     * covered:
-     * </p>
-     * <p>
-     * <ul>
-     * <li>{@link XMLInputFactory} configuration properties such as {@link XMLReporter}, {@link XMLResolver} and
-     * {@link XMLEventAllocator}</li>
-     * <li>{@link XMLStreamReader} configuration properties such as <code>systemId</code> and <code>encoding</code>
-     * </li>
-     * <li>Commons Modula object model configuration properties such as the list of custom actions and the
-     * {@link PathResolver} to use.</li>
-     * </ul>
+     * {@link ModulaReader}配置信息，以下信息必须提供：
+     * {@link XMLInputFactory}：{@link XMLReporter}, {@link XMLResolver}，{@link XMLEventAllocator}
+     * {@link XMLStreamReader}：systemId，encoding
+     * CustomActions
+     * {@link PathResolver}
      */
     public static class Configuration {
-
-        /*
-         * Configuration properties for this {@link ModulaReader}.
-         */
-        // XMLInputFactory configuration properties.
+        // XMLInputFactory相关属性
         /**
-         * The <code>factoryId</code> to use for the {@link XMLInputFactory}.
+         * factoryId
          */
         final String factoryId;
 
         /**
-         * The {@link ClassLoader} to use for the {@link XMLInputFactory} instance to create.
+         * xmlInputFactory加载ClassLoader
          */
         final ClassLoader factoryClassLoader;
 
         /**
-         * The {@link XMLEventAllocator} for the {@link XMLInputFactory}.
-         */
-        final XMLEventAllocator allocator;
-
-        /**
-         * The map of properties (keys are property name strings, values are object property values) for the
-         * {@link XMLInputFactory}.
+         * key:属性名
          */
         final Map<String, Object> properties;
 
         /**
-         * The {@link XMLResolver} for the {@link XMLInputFactory}.
+         * XMLResolver
          */
         final XMLResolver resolver;
 
         /**
-         * The {@link XMLReporter} for the {@link XMLInputFactory}.
+         * XMLReporter
          */
         final XMLReporter reporter;
 
-        // XMLStreamReader configuration properties.
         /**
-         * The <code>encoding</code> to use for the {@link XMLStreamReader}.
+         * XMLEventAllocator
+         */
+        final XMLEventAllocator allocator;
+
+        // XMLStreamReader相关属性
+        /**
+         * encoding
          */
         final String encoding;
 
         /**
-         * The <code>systemId</code> to use for the {@link XMLStreamReader}.
+         * systemId
          */
         final String systemId;
 
         /**
-         * Whether to validate the input with the XML Schema for Modula.
+         * 是否校验文档
          */
         final boolean validate;
 
-        // Commons Modula object model configuration properties.
+        // Modula相关配置
         /**
-         * The list of Commons Modula custom actions that will be available for this document.
+         * CustomAction列表
          */
         final List<CustomAction> customActions;
 
         /**
-         * The {@link ClassLoader} to use for loading the {@link CustomAction} instances to create.
+         * customAction加载ClassLoader
          */
         final ClassLoader customActionClassLoader;
 
         /**
-         * Whether to use the thread context {@link ClassLoader} for loading any {@link CustomAction} classes.
+         * 是否使用线程上下文加载customAction
          */
         final boolean useContextClassLoaderForCustomActions;
 
         /**
-         * The map for bookkeeping the current active namespace declarations. The keys are prefixes and the values are
-         * {@link Stack}s containing the corresponding namespaceURIs, with the active one on top.
+         * 命名空间，value保存在{@link Stack}s，当前活动的在最上面
          */
         final Map<String, Stack<String>> namespaces;
 
-        // Mutable Commons Modula object model configuration properties.
+        // Modula可变配置
         /**
-         * The parent Modula document if this document is src'ed in via the &lt;state&gt; or &lt;parallel&gt; element's
-         * "src" attribute.
+         * 父文档，在state src配置时
          */
         Modula parent;
 
         /**
-         * The Commons Modula {@link PathResolver} to use for this document.
+         * PathResolver
          */
         PathResolver pathResolver;
 
         /**
-         * Whether to silently ignore any unknown or invalid elements
-         * or to leave warning logs for those.
+         * 未知或非法元素处理，打日志或忽略
          */
         boolean silent;
 
         /**
-         * Whether to strictly throw a model exception when there are any unknown or invalid elements
-         * or to leniently allow to read the model even with those.
+         * 未知或非法元素处理，是否抛出异常
          */
         boolean strict;
 
         /*
-         * Public constructors
+         * Public 构造器
          */
 
         /**
-         * Default constructor.
-         */
-        public Configuration() {
-            this(null, null);
-        }
-
-        /**
-         * Minimal convenience constructor.
-         *
-         * @param reporter     The {@link XMLReporter} to use for this reading.
-         * @param pathResolver The Commons Modula {@link PathResolver} to use for this reading.
+         * 最小构造器
          */
         public Configuration(final XMLReporter reporter, final PathResolver pathResolver) {
             this(null, null, null, null, null, reporter, null, null, false, pathResolver, null, null, null, false);
         }
 
         /**
-         * Convenience constructor.
-         *
-         * @param reporter      The {@link XMLReporter} to use for this reading.
-         * @param pathResolver  The Commons Modula {@link PathResolver} to use for this reading.
-         * @param customActions The list of Commons Modula custom actions that will be available for this document.
+         * 支持customActions构造器
          */
         public Configuration(final XMLReporter reporter, final PathResolver pathResolver,
                              final List<CustomAction> customActions) {
@@ -788,56 +908,7 @@ public final class ModulaReader {
         }
 
         /**
-         * All purpose constructor. Any of the parameters passed in can be <code>null</code> (booleans should default
-         * to <code>false</code>).
-         *
-         * @param factoryId                             The <code>factoryId</code> to use.
-         * @param classLoader                           The {@link ClassLoader} to use for the {@link XMLInputFactory} instance to create.
-         * @param allocator                             The {@link XMLEventAllocator} for the {@link XMLInputFactory}.
-         * @param properties                            The map of properties (keys are property name strings, values are object property values)
-         *                                              for the {@link XMLInputFactory}.
-         * @param resolver                              The {@link XMLResolver} for the {@link XMLInputFactory}.
-         * @param reporter                              The {@link XMLReporter} for the {@link XMLInputFactory}.
-         * @param encoding                              The <code>encoding</code> to use for the {@link XMLStreamReader}
-         * @param systemId                              The <code>systemId</code> to use for the {@link XMLStreamReader}
-         * @param validate                              Whether to validate the input with the XML Schema for Modula.
-         * @param pathResolver                          The Commons Modula {@link PathResolver} to use for this document.
-         * @param customActions                         The list of Commons Modula custom actions that will be available for this document.
-         * @param customActionClassLoader               The {@link ClassLoader} to use for the {@link CustomAction} instances to
-         *                                              create.
-         * @param useContextClassLoaderForCustomActions Whether to use the thread context {@link ClassLoader} for the
-         *                                              {@link CustomAction} instances to create.
-         */
-        public Configuration(final String factoryId, final ClassLoader classLoader, final XMLEventAllocator allocator,
-                             final Map<String, Object> properties, final XMLResolver resolver, final XMLReporter reporter,
-                             final String encoding, final String systemId, final boolean validate, final PathResolver pathResolver,
-                             final List<CustomAction> customActions, final ClassLoader customActionClassLoader,
-                             final boolean useContextClassLoaderForCustomActions) {
-            this(factoryId, classLoader, allocator, properties, resolver, reporter, encoding, systemId, validate,
-                    pathResolver, null, customActions, customActionClassLoader,
-                    useContextClassLoaderForCustomActions);
-        }
-
-        /*
-         * Package access constructors
-         */
-
-        /**
-         * Convenience package access constructor.
-         *
-         * @param reporter     The {@link XMLReporter} for the {@link XMLInputFactory}.
-         * @param pathResolver The Commons Modula {@link PathResolver} to use for this document.
-         * @param parent       The parent Modula document if this document is src'ed in via the &lt;state&gt; or
-         *                     &lt;parallel&gt; element's "src" attribute.
-         */
-        Configuration(final XMLReporter reporter, final PathResolver pathResolver, final Modula parent) {
-            this(null, null, null, null, null, reporter, null, null, false, pathResolver, parent, null, null, false);
-        }
-
-        /**
-         * Package access copy constructor.
-         *
-         * @param source The source {@link Configuration} to replicate.
+         * 复制构造器
          */
         Configuration(final Configuration source) {
             this(source.factoryId, source.factoryClassLoader, source.allocator, source.properties, source.resolver,
@@ -847,27 +918,7 @@ public final class ModulaReader {
         }
 
         /**
-         * All-purpose package access constructor.
-         *
-         * @param factoryId                             The <code>factoryId</code> to use.
-         * @param factoryClassLoader                    The {@link ClassLoader} to use for the {@link XMLInputFactory} instance to
-         *                                              create.
-         * @param allocator                             The {@link XMLEventAllocator} for the {@link XMLInputFactory}.
-         * @param properties                            The map of properties (keys are property name strings, values are object property values)
-         *                                              for the {@link XMLInputFactory}.
-         * @param resolver                              The {@link XMLResolver} for the {@link XMLInputFactory}.
-         * @param reporter                              The {@link XMLReporter} for the {@link XMLInputFactory}.
-         * @param encoding                              The <code>encoding</code> to use for the {@link XMLStreamReader}
-         * @param systemId                              The <code>systemId</code> to use for the {@link XMLStreamReader}
-         * @param validate                              Whether to validate the input with the XML Schema for Modula.
-         * @param pathResolver                          The Commons Modula {@link PathResolver} to use for this document.
-         * @param parent                                The parent Modula document if this document is src'ed in via the &lt;state&gt; or
-         *                                              &lt;parallel&gt; element's "src" attribute.
-         * @param customActions                         The list of Commons Modula custom actions that will be available for this document.
-         * @param customActionClassLoader               The {@link ClassLoader} to use for the {@link CustomAction} instances to
-         *                                              create.
-         * @param useContextClassLoaderForCustomActions Whether to use the thread context {@link ClassLoader} for the
-         *                                              {@link CustomAction} instances to create.
+         * 全属性构造器
          */
         Configuration(final String factoryId, final ClassLoader factoryClassLoader, final XMLEventAllocator allocator,
                       final Map<String, Object> properties, final XMLResolver resolver, final XMLReporter reporter,
@@ -880,30 +931,7 @@ public final class ModulaReader {
         }
 
         /**
-         * All-purpose package access constructor.
-         *
-         * @param factoryId                             The <code>factoryId</code> to use.
-         * @param factoryClassLoader                    The {@link ClassLoader} to use for the {@link XMLInputFactory} instance to
-         *                                              create.
-         * @param allocator                             The {@link XMLEventAllocator} for the {@link XMLInputFactory}.
-         * @param properties                            The map of properties (keys are property name strings, values are object property values)
-         *                                              for the {@link XMLInputFactory}.
-         * @param resolver                              The {@link XMLResolver} for the {@link XMLInputFactory}.
-         * @param reporter                              The {@link XMLReporter} for the {@link XMLInputFactory}.
-         * @param encoding                              The <code>encoding</code> to use for the {@link XMLStreamReader}
-         * @param systemId                              The <code>systemId</code> to use for the {@link XMLStreamReader}
-         * @param validate                              Whether to validate the input with the XML Schema for Modula.
-         * @param pathResolver                          The Commons Modula {@link PathResolver} to use for this document.
-         * @param parent                                The parent Modula document if this document is src'ed in via the &lt;state&gt; or
-         *                                              &lt;parallel&gt; element's "src" attribute.
-         * @param customActions                         The list of Commons Modula custom actions that will be available for this document.
-         * @param customActionClassLoader               The {@link ClassLoader} to use for the {@link CustomAction} instances to
-         *                                              create.
-         * @param useContextClassLoaderForCustomActions Whether to use the thread context {@link ClassLoader} for the
-         *                                              {@link CustomAction} instances to create.
-         * @param silent                                Whether to silently ignore any unknown or invalid elements or to leave warning logs for those.
-         * @param strict                                Whether to strictly throw a model exception when there are any unknown or invalid elements
-         *                                              or to leniently allow to read the model even with those.
+         * 全属性构造器，支持silent和strict配置
          */
         Configuration(final String factoryId, final ClassLoader factoryClassLoader, final XMLEventAllocator allocator,
                       final Map<String, Object> properties, final XMLResolver resolver, final XMLReporter reporter,
@@ -934,10 +962,7 @@ public final class ModulaReader {
          */
 
         /**
-         * Get the current namespaces at this point in the StAX reading.
-         *
-         * @return Map<String,String> The namespace map (keys are prefixes and values are the corresponding current
-         * namespace URIs).
+         * 获取命名空间
          */
         Map<String, String> getCurrentNamespaces() {
             Map<String, String> currentNamespaces = new HashMap<String, String>();
@@ -948,41 +973,23 @@ public final class ModulaReader {
         }
 
         /**
-         * Returns true if it is set to read models silently without any model error warning logs.
-         *
-         * @return
-         * @see {@link #silent}
+         * 是否打错误日志
          */
         public boolean isSilent() {
             return silent;
         }
 
-        /**
-         * Turn on/off silent mode (whether to read models silently without any model error warning logs)
-         *
-         * @param silent
-         * @see {@link #silent}
-         */
         public void setSilent(boolean silent) {
             this.silent = silent;
         }
 
         /**
-         * Returns true if it is set to check model strictly with throwing exceptions on any model error.
-         *
-         * @return
-         * @see {@link #strict}
+         * 是否抛出异常
          */
         public boolean isStrict() {
             return strict;
         }
 
-        /**
-         * Turn on/off strict model (whether to check model strictly with throwing exception on any model error)
-         *
-         * @param strict
-         * @see {@link #strict}
-         */
         public void setStrict(boolean strict) {
             this.strict = strict;
         }

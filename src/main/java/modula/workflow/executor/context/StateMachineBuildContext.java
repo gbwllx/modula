@@ -1,9 +1,12 @@
 package modula.workflow.executor.context;
 
+import modula.core.model.ModelException;
 import modula.workflow.executor.statemachine.StateMachine;
 import modula.workflow.executor.statemachine.StateMachineBuilder;
 import modula.workflow.listener.DefaultWorkflowListener;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +27,7 @@ public class StateMachineBuildContext {
     private ClassLoader         classLoader = Thread.currentThread().getContextClassLoader();
     private StateMachineBuilder builder = new StateMachineBuilder();
 
-    public StateMachine createStateMachine() {
+    public StateMachine createStateMachine() throws ModelException, XMLStreamException, IOException {
         return builder.build();
     }
 

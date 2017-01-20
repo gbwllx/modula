@@ -26,20 +26,20 @@ import java.util.Map;
  * <p> Invoker接口用于定义状态机(executor)和调用活动之间的交互</p>
  * <p> 调用活动需要注册一个Invoker实现类 作为合适的ModulaParentIOProcessor的target</p>
  * <p> 被调用活动需要发送一个“done”事件T
- *
+ * <p>
  * <p>Invoker的生命周期如下：
- *  <ol>
- *   <li>Instantiation via {@link Class#newInstance()}
- *       (Invoker implementation requires accessible constructor).</li>
- *   <li>Configuration (setters for invoke ID and
- *       {@link ModulaIOProcessor}).</li>
- *   <li>Initiation of invoked activity via invoke() method, passing
- *       the source URI and the map of params.</li>
- *   <li>Zero or more bi-directional event triggering.</li>
- *   <li>Either completion or cancellation.</li>
- *  </ol>
+ * <ol>
+ * <li>Instantiation via {@link Class#newInstance()}
+ * (Invoker implementation requires accessible constructor).</li>
+ * <li>Configuration (setters for invoke ID and
+ * {@link ModulaIOProcessor}).</li>
+ * <li>Initiation of invoked activity via invoke() method, passing
+ * the source URI and the map of params.</li>
+ * <li>Zero or more bi-directional event triggering.</li>
+ * <li>Either completion or cancellation.</li>
+ * </ol>
  * </p>
- *
+ * <p>
  * <p>invoke()只支持异步，需要同步换用其他实现，例如event</p>
  */
 public interface Invoker {
@@ -72,22 +72,20 @@ public interface Invoker {
      *                          invoking the source.
      */
     void invoke(String source, Map<String, Object> params)
-    throws InvokerException;
+            throws InvokerException;
 
     /**
      * Forwards the event triggered on the parent state machine
      * on to the invoked activity.
      *
-     * @param event
-     *            an external event which triggered during the last
-     *            time quantum
-     *
+     * @param event an external event which triggered during the last
+     *              time quantum
      * @throws InvokerException In case there is a fatal problem with
      *                          processing the events forwarded by the
      *                          parent state machine.
      */
     void parentEvent(TriggerEvent event)
-    throws InvokerException;
+            throws InvokerException;
 
     /**
      * Cancel this invocation.
@@ -96,7 +94,7 @@ public interface Invoker {
      *                          canceling this invoke.
      */
     void cancel()
-    throws InvokerException;
+            throws InvokerException;
 
 }
 

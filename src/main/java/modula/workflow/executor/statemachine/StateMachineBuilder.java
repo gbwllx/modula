@@ -1,10 +1,14 @@
 package modula.workflow.executor.statemachine;
 
 
+import modula.core.model.ModelException;
 import modula.core.model.Modula;
 import modula.workflow.executor.factory.ModulaFactory;
+import modula.workflow.executor.factory.URLModulaFactory;
 import modula.workflow.listener.DefaultWorkflowListener;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -31,20 +35,20 @@ public class StateMachineBuilder {
     /**
      * 创建Modula工厂
      */
-    private ModulaFactory workflowFactory = null;
+    private ModulaFactory modulaFactory = null;
 
     /**
      * modula缓存
      */
     private final ModulaHolder modulaCache = new ModulaHolder();
 
-    public StateMachine build() {
+    public StateMachine build() throws ModelException, XMLStreamException, IOException {
         verify();
         //TODO:学到1，缓存的频繁使用
         Modula modula = modulaCache.get();
         if (modula == null) {
             int version = modulaCache.version.get();
-            modula = workflowFactory.createModula(actions);
+            modula = modulaFactory.createModula(actions);
             modulaCache.set(version, modula);
         }
 
@@ -57,7 +61,7 @@ public class StateMachineBuilder {
     }
 
     public StateMachineBuilder url(URL modulaURL) {
-        //this.scxmlFactory = new URLSCXMLFactory(modulaURL);
+        this.modulaFactory = new URLModulaFactory(modulaURL);
         return this;
     }
 

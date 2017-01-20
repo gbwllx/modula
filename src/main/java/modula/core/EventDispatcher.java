@@ -29,27 +29,21 @@ import java.util.Map;
 public interface EventDispatcher {
 
     /**
-     * Cancel the specified send message.
-     *
-     * @param sendId The ID of the send message to cancel
+     * 取消消息
      */
     void cancel(String sendId);
 
     /**
      * Send this message to the target.
      *
-     * @param sendId        The ID of the send message
+     * @param sendId        消息ID
      * @param target        An expression returning the target location of the event
-     * @param type          The type of the Event I/O Processor that the event should
-     *                      be dispatched to
-     * @param event         The type of event being generated.
-     * @param params        A list of zero or more whitespace separated variable
-     *                      names to be included with the event.
-     * @param hints         The data containing information which may be
-     *                      used by the implementing platform to configure the event processor
-     * @param delay         The event is dispatched after the delay interval elapses
-     * @param externalNodes The list of external nodes associated with
-     *                      the &lt;send&gt; element.
+     * @param type          接收消息的EventIOProcessor类型
+     * @param event         event类型
+     * @param params        0以上个变量
+     * @param hints         信息
+     * @param delay         延迟时间
+     * @param externalNodes 外部节点
      */
     void send(String sendId, String target, String type,
               String event, Map<String, Object> params, Object hints,

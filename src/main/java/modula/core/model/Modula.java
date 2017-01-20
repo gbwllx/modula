@@ -13,11 +13,16 @@ import java.util.Map;
  * @author: gubing.gb
  * @date: 2016/12/30.
  */
-public class Modula implements Serializable, LifeCycle {
+public class Modula implements Serializable, LifeCycle, Observable, NamespacePrefixesHolder {
     /**
      * Modula 版本号
      */
     private String version;
+
+    /**
+     * 初始态
+     */
+    private String initial;
 
     /**
      * datamodel 可选属性
@@ -27,7 +32,10 @@ public class Modula implements Serializable, LifeCycle {
      * 自动生成TransitionTarget id 的前缀
      */
     public static final String GENERATED_TT_ID_PREFIX = "_generated_tt_id_";
-
+    /**
+     * 默认observerId
+     */
+    private static final Integer MODULA_OBSERVABLE_ID = 0;
     /**
      * Modula初始Transition
      */
@@ -44,9 +52,21 @@ public class Modula implements Serializable, LifeCycle {
     private Map<String, TransitionTarget> targets;
 
     /**
+     * 命名空间
+     */
+    private Map<String, String> namespaces;
+
+    /**
      * 状态机名字
      */
     private String name;
+
+    /**
+     * transitionTarget下一个ID
+     *
+     * @see #generateTransitionTargetId()
+     */
+    private long ttNextId;
 
     public Modula() {
         this.children = new ArrayList<EnterableState>();
@@ -96,11 +116,59 @@ public class Modula implements Serializable, LifeCycle {
         this.children = children;
     }
 
+    public final EnterableState getFirstChild() {
+        if (!children.isEmpty()) {
+            return children.get(0);
+        }
+        return null;
+    }
+
+    public final void addChild(final EnterableState es) {
+        children.add(es);
+    }
+
     public Map<String, TransitionTarget> getTargets() {
         return targets;
     }
 
     public void setTargets(Map<String, TransitionTarget> targets) {
         this.targets = targets;
+    }
+
+    public final void addTarget(final TransitionTarget target) {
+        targets.put(target.getId(), target);
+    }
+
+
+    public String getInitial() {
+        return initial;
+    }
+
+    public void setInitial(String initial) {
+        this.initial = initial;
+    }
+
+    @Override
+    public void setNamespaces(Map<String, String> namespaces) {
+        this.namespaces = namespaces;
+    }
+
+    @Override
+    public Map<String, String> getNamespaces() {
+        return namespaces;
+    }
+
+    @Override
+    public Integer getObservableId() {
+        return MODULA_OBSERVABLE_ID;
+    }
+
+    /**
+     * Simple unique TransitionTarget id value generation
+     *
+     * @return a unique TransitionTarget id for this SCXML instance
+     */
+    public final String generateTransitionTargetId() {
+        return GENERATED_TT_ID_PREFIX + ttNextId++;
     }
 }

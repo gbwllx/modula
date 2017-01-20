@@ -5,17 +5,12 @@ import modula.core.model.Transition;
 import modula.core.model.TransitionTarget;
 
 /**
- * Helper methods for Commons Modula logging.
+ * 日志工具类
  */
 public final class LogUtils {
 
     /**
-     * Create a human readable log view of this transition.
-     *
-     * @param from       The source TransitionTarget
-     * @param to         The destination TransitionTarget
-     * @param transition The Transition that is taken
-     * @return String The human readable log entry
+     * transition格式化
      */
     public static String transToString(final TransitionTarget from,
                                        final TransitionTarget to, final Transition transition, String event) {
@@ -29,11 +24,7 @@ public final class LogUtils {
     }
 
     /**
-     * Write out this TransitionTarget location in a XPath style format.
-     *
-     * @param tt The TransitionTarget whose &quot;path&quot; is to needed
-     * @return String The XPath style location of the TransitionTarget within
-     * the SCXML document
+     * 转换成xpath格式，/xxx/xxx/xx
      */
     public static String getTTPath(final TransitionTarget tt) {
         StringBuilder sb = new StringBuilder("/");
@@ -46,7 +37,7 @@ public final class LogUtils {
     }
 
     /**
-     * Discourage instantiation since this is a utility class.
+     * 工具类，不支持实例化
      */
     private LogUtils() {
         super();

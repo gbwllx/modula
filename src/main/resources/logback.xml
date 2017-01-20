@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- http://logback.qos.ch/manual/layouts.html -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d %-5p %c{2} - %F - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="modulaLogger" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="modula.core.ModulaExecutionContext" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+
+    <logger name="modula.workflow.listener.DefaultWorkflowListener" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <root level="error">
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>

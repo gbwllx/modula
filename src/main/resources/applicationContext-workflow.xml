@@ -20,15 +20,8 @@
 
     <bean id="modula" class="modula.workflow.executor.factory.WorkflowSpringFactoryBean">
         <property name="path" value="modula/workflow.xml"/>
-        <property name="action">
-            <map>
-                <entry key="calc">
-                    <value type="java.lang.Class">com.alibaba.shared.xfsm.example.helloworld.CalcAction</value>
-                </entry>
-            </map>
-        </property>
         <property name="listener">
-            <bean class="com.alibaba.shared.xfsm.core.listener.SimpleXFSMListener"/>
+            <bean class="modula.workflow.listener.DefaultWorkflowListener"/>
         </property>
     </bean>
 

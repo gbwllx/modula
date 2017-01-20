@@ -111,8 +111,8 @@ public class SimpleErrorReporter implements ErrorReporter, Serializable {
     }
 
     /**
-     * Final handling of the resulting errorMessage build by {@link #onError(String, String, Object)} onError}.
-     * <p>The default implementation write the errorMessage as a warning to the log.</p>
+     * 错误处理函数{@link #onError(String, String, Object)} onError}.
+     * 默认只记录warning日志
      */
     protected void handleErrorMessage(final String errorCode, final String errDetail,
                                       final Object errCtx, final CharSequence errorMessage) {

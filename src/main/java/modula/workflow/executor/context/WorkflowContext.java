@@ -1,5 +1,11 @@
 package modula.workflow.executor.context;
 
+import modula.workflow.executor.WorkflowEvent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @description:
  * @author: gubing.gb
@@ -8,6 +14,7 @@ package modula.workflow.executor.context;
 public class WorkflowContext {
     private String key;
     private String currentState;
+    private List<WorkflowEvent> events;
 
     public WorkflowContext(String key) {
         this(key, null);
@@ -32,5 +39,19 @@ public class WorkflowContext {
 
     public void setCurrentState(String currentState) {
         this.currentState = currentState;
+    }
+
+    public List<WorkflowEvent> getEvents() {
+        return events;
+    }
+
+    public WorkflowContext setEvents(WorkflowEvent... events) {
+        if (events != null && events.length > 0){
+            this.events = new ArrayList<WorkflowEvent>();
+            this.events.addAll(Arrays.asList(events));
+        } else {
+            this.events = null;
+        }
+        return this;
     }
 }

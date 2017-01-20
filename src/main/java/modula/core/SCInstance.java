@@ -102,13 +102,6 @@ public class SCInstance implements Serializable {
      */
     private Context globalContext;
 
-    /**
-     * Constructor
-     *
-     * @param internalIOProcessor The I/O Processor for the internal event queue
-     * @param //evaluator         The evaluator
-     * @param errorReporter       The error reporter
-     */
     protected SCInstance(final ModulaIOProcessor internalIOProcessor, /*final Evaluator evaluator,*/
                          final ErrorReporter errorReporter) {
         this.internalIOProcessor = internalIOProcessor;
@@ -118,10 +111,7 @@ public class SCInstance implements Serializable {
     }
 
     /**
-     * (re)Initializes the state machine instance, clearing all variable contexts, histories and current status,
-     * and clones the Modula root datamodel into the root context.
-     *
-     * @throws ModelException if the state machine hasn't been setup for this instance
+     * 重新初始化状态机
      */
     protected void initialize() throws ModelException {
         if (stateMachine == null) {
@@ -146,10 +136,7 @@ public class SCInstance implements Serializable {
     }
 
     /**
-     * Detach this state machine instance to allow external serialization.
-     * <p>
-     * This clears the internal I/O processor, evaluator and errorReporter members.
-     * </p>
+     * 分离状态机，使能够序列化，分离errorReporte，eveluator等
      */
     protected void detach() {
         //this.evaluator = null;
@@ -356,6 +343,7 @@ public class SCInstance implements Serializable {
             EnterableState parent = state.getParent();
             if (parent == null) {
                 // docroot
+                //TODO
                 //context = evaluator.newContext(getGlobalContext());
             } else {
                 //context = evaluator.newContext(getContext(parent));

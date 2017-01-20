@@ -17,23 +17,16 @@
 package modula.core;
 
 /**
- * An interface for reporting SCXML errors to the host environment,
- * containing the definition of commonly occuring errors while executing
- * SCXML documents.
- *
+ * 上报解析modula文档时发生的错误给宿主环境
  */
 public interface ErrorReporter {
 
     /**
-     * Handler for reporting an error.
+     * 上报错误
      *
-     * @param errCode
-     *            one of the ErrorReporter's constants
-     * @param errDetail
-     *            human readable description
-     * @param errCtx
-     *            typically an SCXML element which caused an error,
-     *            may be accompanied by additional information
+     * @param errCode 错误码
+     * @param errDetail 错误信息
+     * @param errCtx 引起错误的文档位置
      */
     void onError(String errCode, String errDetail, Object errCtx);
 }

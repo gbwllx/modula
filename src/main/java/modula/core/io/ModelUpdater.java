@@ -16,8 +16,7 @@
  */
 package modula.core.io;
 
-import modula.core.model.ModelException;
-import modula.core.model.Modula;
+import modula.core.model.*;
 import org.apache.commons.logging.LogFactory;
 
 import java.text.MessageFormat;
@@ -121,369 +120,327 @@ final class ModelUpdater {
         super();
     }
 
-//    /*
-//     * Post-processing methods to make the Modula object ModulaExecutor ready.
-//     */
-//    /**
-//     * <p>Update the Modula object model and make it ModulaExecutor ready.
-//     * This is part of post-read processing, and sets up the necessary
-//     * object references throughtout the Modula object model for the parsed
-//     * document.</p>
-//     *
-//     * @param modula The Modula object (output from ModulaReader)
-//     * @throws ModelException If the object model is flawed
-//     */
-//    static void updateModula(final Modula modula) throws ModelException {
-//        initDocumentOrder(modula.getChildren(), 1);
-//
-//        String initial = modula.getInitial();
-//        SimpleTransition initialTransition = new SimpleTransition();
-//
-//        if (initial != null) {
-//
-//            initialTransition.setNext(modula.getInitial());
-//            updateTransition(initialTransition, modula.getTargets());
-//
-//            if (initialTransition.getTargets().size() == 0) {
-//                logAndThrowModelError(ERR_Modula_NO_INIT, new Object[] {
-//                        initial });
-//            }
-//        } else {
-//            // If 'initial' is not specified, the default initial state is
-//            // the first child state in document order.
-//            initialTransition.getTargets().add(modula.getFirstChild());
-//        }
-//
-//        modula.setInitialTransition(initialTransition);
-//        Map<String, TransitionTarget> targets = modula.getTargets();
-//        for (EnterableState es : modula.getChildren()) {
-//            if (es instanceof State) {
-//                updateState((State) es, targets);
-//            } else if (es instanceof Parallel) {
-//                updateParallel((Parallel) es, targets);
-//            }
-//        }
-//
-//        modula.getInitialTransition().setObservableId(1);
-//        initObservables(modula.getChildren(), 2);
-//    }
-//
-//    /**
-//     * Initialize all {@link org.apache.commons.modula2.model.DocumentOrder} instances (EnterableState or Transition)
-//     * by iterating them in document order setting their document order value.
-//     * @param states The list of children states of a parent TransitionalState or the Modula document itself
-//     * @param nextOrder The next to be used order value
-//     * @return Returns the next to be used order value
-//     */
-//    private static int initDocumentOrder(final List<EnterableState> states, int nextOrder) {
-//        for (EnterableState state : states) {
-//            state.setOrder(nextOrder++);
-//            if (state instanceof TransitionalState) {
-//                TransitionalState ts = (TransitionalState)state;
-//                for (Transition t : ts.getTransitionsList()) {
-//                    t.setOrder(nextOrder++);
-//                }
-//                nextOrder = initDocumentOrder(ts.getChildren(), nextOrder);
-//            }
-//        }
-//        return nextOrder;
-//    }
-//
-//    /**
-//     * Initialize all {@link org.apache.commons.modula2.model.Observable} instances in the Modula document
-//     * by iterating them in document order and seeding them with a unique obeservable id.
-//     * @param states The list of children states of a parent TransitionalState or the Modula document itself
-//     * @param nextObservableId The next observable id sequence value to be used
-//     * @return Returns the next to be used observable id sequence value
-//     */
-//    private static int initObservables(final List<EnterableState>states, int nextObservableId) {
-//        for (EnterableState es : states) {
-//            es.setObservableId(nextObservableId++);
-//            if (es instanceof TransitionalState) {
-//                TransitionalState ts = (TransitionalState)es;
-//                if (ts instanceof State) {
-//                    State s = (State)ts;
-//                    if (s.getInitial() != null && s.getInitial().getTransition() != null) {
-//                        s.getInitial().getTransition().setObservableId(nextObservableId++);
-//                    }
-//                }
-//                for (Transition t : ts.getTransitionsList()) {
-//                    t.setObservableId(nextObservableId++);
-//                }
-//                for (History h : ts.getHistory()) {
-//                    h.setObservableId(nextObservableId++);
-//                    if (h.getTransition() != null) {
-//                        h.getTransition().setObservableId(nextObservableId++);
-//                    }
-//                }
-//                nextObservableId = initObservables(ts.getChildren(), nextObservableId);
-//            }
-//        }
-//        return nextObservableId;
-//    }
-//
-//    /**
-//     * Update this State object (part of post-read processing).
-//     * Also checks for any errors in the document.
-//     *
-//     * @param state The State object
-//     * @param targets The global Map of all transition targets
-//     * @throws ModelException If the object model is flawed
-//     */
-//    private static void updateState(final State state, final Map<String, TransitionTarget> targets)
-//            throws ModelException {
-//        List<EnterableState> children = state.getChildren();
-//        if (state.isComposite()) {
-//            //initialize next / initial
-//            Initial ini = state.getInitial();
-//            if (ini == null) {
-//                state.setFirst(children.get(0).getId());
-//                ini = state.getInitial();
-//            }
-//            SimpleTransition initialTransition = ini.getTransition();
-//            updateTransition(initialTransition, targets);
-//            Set<TransitionTarget> initialStates = initialTransition.getTargets();
-//            // we have to allow for an indirect descendant initial (targets)
-//            //check that initialState is a descendant of s
-//            if (initialStates.size() == 0) {
-//                logAndThrowModelError(ERR_STATE_BAD_INIT,
-//                        new Object[] {getName(state)});
-//            } else {
-//                for (TransitionTarget initialState : initialStates) {
-//                    if (!initialState.isDescendantOf(state)) {
-//                        logAndThrowModelError(ERR_STATE_BAD_INIT,
-//                                new Object[] {getName(state)});
-//                    }
-//                }
-//            }
-//        }
-//        else if (state.getInitial() != null) {
-//            logAndThrowModelError(ERR_UNSUPPORTED_INIT, new Object[] {getName(state)});
-//        }
-//
-//        List<History> histories = state.getHistory();
-//        if (histories.size() > 0 && state.isSimple()) {
-//            logAndThrowModelError(ERR_HISTORY_SIMPLE_STATE,
-//                    new Object[] {getName(state)});
-//        }
-//        for (History history : histories) {
-//            updateHistory(history, targets, state);
-//        }
-//        for (Transition transition : state.getTransitionsList()) {
-//            updateTransition(transition, targets);
-//        }
-//
-//        for (Invoke inv : state.getInvokes()) {
-//            if (inv.getType() == null) {
-//                logAndThrowModelError(ERR_INVOKE_NO_TYPE, new Object[] {getName(state)});
-//            }
-//            if (inv.getSrc() == null && inv.getSrcexpr() == null) {
-//                logAndThrowModelError(ERR_INVOKE_NO_SRC, new Object[] {getName(state)});
-//            }
-//            if (inv.getSrc() != null && inv.getSrcexpr() != null) {
-//                logAndThrowModelError(ERR_INVOKE_AMBIGUOUS_SRC, new Object[] {getName(state)});
-//            }
-//        }
-//
-//        for (EnterableState es : children) {
-//            if (es instanceof State) {
-//                updateState((State) es, targets);
-//            } else if (es instanceof Parallel) {
-//                updateParallel((Parallel) es, targets);
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Update this Parallel object (part of post-read processing).
-//     *
-//     * @param parallel The Parallel object
-//     * @param targets The global Map of all transition targets
-//     * @throws ModelException If the object model is flawed
-//     */
-//    private static void updateParallel(final Parallel parallel, final Map<String, TransitionTarget> targets)
-//            throws ModelException {
-//        for (EnterableState es : parallel.getChildren()) {
-//            if (es instanceof State) {
-//                updateState((State) es, targets);
-//            } else if (es instanceof Parallel) {
-//                updateParallel((Parallel) es, targets);
-//            }
-//        }
-//        for (Transition transition : parallel.getTransitionsList()) {
-//            updateTransition(transition, targets);
-//        }
-//        List<History> histories = parallel.getHistory();
-//        for (History history : histories) {
-//            updateHistory(history, targets, parallel);
-//        }
-//        // TODO: parallel must may have invokes too
-//    }
-//
-//    /**
-//     * Update this History object (part of post-read processing).
-//     *
-//     * @param history The History object
-//     * @param targets The global Map of all transition targets
-//     * @param parent The parent TransitionalState for this History
-//     * @throws ModelException If the object model is flawed
-//     */
-//    private static void updateHistory(final History history,
-//                                      final Map<String, TransitionTarget> targets,
-//                                      final TransitionalState parent)
-//            throws ModelException {
-//        SimpleTransition transition = history.getTransition();
-//        if (transition == null || transition.getNext() == null) {
-//            logAndThrowModelError(ERR_HISTORY_NO_DEFAULT,
-//                    new Object[] {history.getId(), getName(parent)});
-//        }
-//        else {
-//            updateTransition(transition, targets);
-//            Set<TransitionTarget> historyStates = transition.getTargets();
-//            if (historyStates.size() == 0) {
-//                logAndThrowModelError(ERR_STATE_NO_HIST,
-//                        new Object[] {getName(parent)});
-//            }
-//            for (TransitionTarget historyState : historyStates) {
-//                if (!history.isDeep()) {
-//                    // Shallow history
-//                    if (!parent.getChildren().contains(historyState)) {
-//                        logAndThrowModelError(ERR_STATE_BAD_SHALLOW_HIST,
-//                                new Object[] {getName(parent)});
-//                    }
-//                } else {
-//                    // Deep history
-//                    if (!historyState.isDescendantOf(parent)) {
-//                        logAndThrowModelError(ERR_STATE_BAD_DEEP_HIST,
-//                                new Object[] {getName(parent)});
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Update this Transition object (part of post-read processing).
-//     *
-//     * @param transition The Transition object
-//     * @param targets The global Map of all transition targets
-//     * @throws ModelException If the object model is flawed
-//     */
-//    private static void updateTransition(final SimpleTransition transition,
-//                                         final Map<String, TransitionTarget> targets) throws ModelException {
-//        String next = transition.getNext();
-//        if (next == null) { // stay transition
-//            return;
-//        }
-//        Set<TransitionTarget> tts = transition.getTargets();
-//        if (tts.isEmpty()) {
-//            // 'next' is a space separated list of transition target IDs
-//            StringTokenizer ids = new StringTokenizer(next);
-//            while (ids.hasMoreTokens()) {
-//                String id = ids.nextToken();
-//                TransitionTarget tt = targets.get(id);
-//                if (tt == null) {
-//                    logAndThrowModelError(ERR_TARGET_NOT_FOUND, new Object[] {
-//                            id });
-//                }
-//                tts.add(tt);
-//            }
-//            if (tts.size() > 1) {
-//                boolean legal = verifyTransitionTargets(tts);
-//                if (!legal) {
-//                    logAndThrowModelError(ERR_ILLEGAL_TARGETS, new Object[] {
-//                            next });
-//                }
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Log an error discovered in post-read processing.
-//     *
-//     * @param errType The type of error
-//     * @param msgArgs The arguments for formatting the error message
-//     * @throws ModelException The model error, always thrown.
-//     */
-//    private static void logAndThrowModelError(final String errType,
-//                                              final Object[] msgArgs) throws ModelException {
-//        MessageFormat msgFormat = new MessageFormat(errType);
-//        String errMsg = msgFormat.format(msgArgs);
-//        org.apache.commons.logging.Log log = LogFactory.
-//                getLog(ModelUpdater.class);
-//        log.error(errMsg);
-//        throw new ModelException(errMsg);
-//    }
-//
-//    /**
-//     * Get a transition target identifier for error messages. This method is
-//     * only called to produce an appropriate log message in some error
-//     * conditions.
-//     *
-//     * @param tt The <code>TransitionTarget</code> object
-//     * @return The transition target identifier for the error message
-//     */
-//    private static String getName(final TransitionTarget tt) {
-//        String name = "anonymous transition target";
-//        if (tt instanceof State) {
-//            name = "anonymous state";
-//            if (tt.getId() != null) {
-//                name = "state with ID \"" + tt.getId() + "\"";
-//            }
-//        } else if (tt instanceof Parallel) {
-//            name = "anonymous parallel";
-//            if (tt.getId() != null) {
-//                name = "parallel with ID \"" + tt.getId() + "\"";
-//            }
-//        } else {
-//            if (tt.getId() != null) {
-//                name = "transition target with ID \"" + tt.getId() + "\"";
-//            }
-//        }
-//        return name;
-//    }
-//
-//    /**
-//     * If a transition has multiple targets, then they satisfy the following
-//     * criteria:
-//     * <ul>
-//     *  <li>No target is an ancestor of any other target on the list</li>
-//     *  <li>A full legal state configuration results when all ancestors and default initial descendants have been added.
-//     *  <br/>This means that they all must share the same least common parallel ancestor.
-//     *  </li>
-//     * </ul>
-//     *
-//     * @param tts The transition targets
-//     * @return Whether this is a legal configuration
-//     * @see <a href=http://www.w3.org/TR/2014/CR-modula-20140313/#LegalStateConfigurations">
-//     *     http://www.w3.org/TR/2014/CR-modula-20140313/#LegalStateConfigurations</a>
-//     */
-//    private static boolean verifyTransitionTargets(final Set<TransitionTarget> tts) {
-//        if (tts.size() <= 1) { // No contention
-//            return true;
-//        }
-//
-//        Set<EnterableState> parents = new HashSet<EnterableState>();
-//        for (TransitionTarget tt : tts) {
-//            boolean hasParallelParent = false;
-//            for (int i = tt.getNumberOfAncestors()-1; i > -1; i--) {
-//                EnterableState parent = tt.getAncestor(i);
-//                if (parent instanceof Parallel) {
-//                    hasParallelParent = true;
-//                    // keep on 'reading' as a parallel may have a parent parallel (and even intermediate states)
-//                }
-//                else {
-//                    if (!parents.add(parent)) {
-//                        // this TransitionTarget is an descendant of another, or shares the same Parallel region
-//                        return false;
-//                    }
-//                }
-//            }
-//            if (!hasParallelParent || !(tt.getAncestor(0) instanceof Parallel)) {
-//                // multiple targets MUST all be children of a shared parallel
-//                return false;
-//            }
-//        }
-//        return true;
-//   }
+    /*
+     * Post-processing methods to make the Modula object ModulaExecutor ready.
+     */
+
+    /**
+     * <p>Update the Modula object model and make it ModulaExecutor ready.
+     * This is part of post-read processing, and sets up the necessary
+     * object references throughtout the Modula object model for the parsed
+     * document.</p>
+     *
+     * @param modula The Modula object (output from ModulaReader)
+     * @throws ModelException If the object model is flawed
+     */
+    static void updateModula(final Modula modula) throws ModelException {
+        initDocumentOrder(modula.getChildren(), 1);
+
+        String initial = modula.getInitial();
+        SimpleTransition initialTransition = new SimpleTransition();
+
+        if (initial != null) {
+
+            initialTransition.setNext(modula.getInitial());
+            updateTransition(initialTransition, modula.getTargets());
+
+            if (initialTransition.getTargets().size() == 0) {
+                logAndThrowModelError(ERR_Modula_NO_INIT, new Object[]{
+                        initial});
+            }
+        } else {
+            // If 'initial' is not specified, the default initial state is
+            // the first child state in document order.
+            initialTransition.getTargets().add(modula.getFirstChild());
+        }
+
+        modula.setInitialTransition(initialTransition);
+        Map<String, TransitionTarget> targets = modula.getTargets();
+        for (EnterableState es : modula.getChildren()) {
+            if (es instanceof State) {
+                updateState((State) es, targets);
+            }
+        }
+
+        modula.getInitialTransition().setObservableId(1);
+        initObservables(modula.getChildren(), 2);
+    }
+
+    /**
+     * Initialize all DocumentOrder instances (EnterableState or Transition)
+     * by iterating them in document order setting their document order value.
+     *
+     * @param states    The list of children states of a parent TransitionalState or the Modula document itself
+     * @param nextOrder The next to be used order value
+     * @return Returns the next to be used order value
+     */
+    private static int initDocumentOrder(final List<EnterableState> states, int nextOrder) {
+        for (EnterableState state : states) {
+            state.setOrder(nextOrder++);
+            if (state instanceof TransitionalState) {
+                TransitionalState ts = (TransitionalState) state;
+                for (Transition t : ts.getTransitionsList()) {
+                    t.setOrder(nextOrder++);
+                }
+                nextOrder = initDocumentOrder(ts.getChildren(), nextOrder);
+            }
+        }
+        return nextOrder;
+    }
+
+    /**
+     * Initialize all Observable instances in the Modula document
+     * by iterating them in document order and seeding them with a unique obeservable id.
+     *
+     * @param states           The list of children states of a parent TransitionalState or the Modula document itself
+     * @param nextObservableId The next observable id sequence value to be used
+     * @return Returns the next to be used observable id sequence value
+     */
+    private static int initObservables(final List<EnterableState> states, int nextObservableId) {
+        for (EnterableState es : states) {
+            es.setObservableId(nextObservableId++);
+            if (es instanceof TransitionalState) {
+                TransitionalState ts = (TransitionalState) es;
+                if (ts instanceof State) {
+                    State s = (State) ts;
+                    if (s.getInitial() != null && s.getInitial().getTransition() != null) {
+                        s.getInitial().getTransition().setObservableId(nextObservableId++);
+                    }
+                }
+                for (Transition t : ts.getTransitionsList()) {
+                    t.setObservableId(nextObservableId++);
+                }
+                for (History h : ts.getHistory()) {
+                    h.setObservableId(nextObservableId++);
+                    if (h.getTransition() != null) {
+                        h.getTransition().setObservableId(nextObservableId++);
+                    }
+                }
+                nextObservableId = initObservables(ts.getChildren(), nextObservableId);
+            }
+        }
+        return nextObservableId;
+    }
+
+    /**
+     * Update this State object (part of post-read processing).
+     * Also checks for any errors in the document.
+     *
+     * @param state   The State object
+     * @param targets The global Map of all transition targets
+     * @throws ModelException If the object model is flawed
+     */
+    private static void updateState(final State state, final Map<String, TransitionTarget> targets)
+            throws ModelException {
+        List<EnterableState> children = state.getChildren();
+        if (state.isComposite()) {
+            //initialize next / initial
+            Initial ini = state.getInitial();
+            if (ini == null) {
+                state.setFirst(children.get(0).getId());
+                ini = state.getInitial();
+            }
+            SimpleTransition initialTransition = ini.getTransition();
+            updateTransition(initialTransition, targets);
+            Set<TransitionTarget> initialStates = initialTransition.getTargets();
+            // we have to allow for an indirect descendant initial (targets)
+            //check that initialState is a descendant of s
+            if (initialStates.size() == 0) {
+                logAndThrowModelError(ERR_STATE_BAD_INIT,
+                        new Object[]{getName(state)});
+            } else {
+                for (TransitionTarget initialState : initialStates) {
+                    if (!initialState.isDescendantOf(state)) {
+                        logAndThrowModelError(ERR_STATE_BAD_INIT,
+                                new Object[]{getName(state)});
+                    }
+                }
+            }
+        } else if (state.getInitial() != null) {
+            logAndThrowModelError(ERR_UNSUPPORTED_INIT, new Object[]{getName(state)});
+        }
+
+        List<History> histories = state.getHistory();
+        if (histories.size() > 0 && state.isSimple()) {
+            logAndThrowModelError(ERR_HISTORY_SIMPLE_STATE,
+                    new Object[]{getName(state)});
+        }
+        for (History history : histories) {
+            updateHistory(history, targets, state);
+        }
+        for (Transition transition : state.getTransitionsList()) {
+            updateTransition(transition, targets);
+        }
+
+        for (Invoke inv : state.getInvokes()) {
+            if (inv.getType() == null) {
+                logAndThrowModelError(ERR_INVOKE_NO_TYPE, new Object[]{getName(state)});
+            }
+            if (inv.getSrc() == null && inv.getSrcexpr() == null) {
+                logAndThrowModelError(ERR_INVOKE_NO_SRC, new Object[]{getName(state)});
+            }
+            if (inv.getSrc() != null && inv.getSrcexpr() != null) {
+                logAndThrowModelError(ERR_INVOKE_AMBIGUOUS_SRC, new Object[]{getName(state)});
+            }
+        }
+
+        for (EnterableState es : children) {
+            if (es instanceof State) {
+                updateState((State) es, targets);
+            }
+        }
+    }
+
+    /**
+     * Update this History object (part of post-read processing).
+     *
+     * @param history The History object
+     * @param targets The global Map of all transition targets
+     * @param parent  The parent TransitionalState for this History
+     * @throws ModelException If the object model is flawed
+     */
+    private static void updateHistory(final History history,
+                                      final Map<String, TransitionTarget> targets,
+                                      final TransitionalState parent)
+            throws ModelException {
+        SimpleTransition transition = history.getTransition();
+        if (transition == null || transition.getNext() == null) {
+            logAndThrowModelError(ERR_HISTORY_NO_DEFAULT,
+                    new Object[]{history.getId(), getName(parent)});
+        } else {
+            updateTransition(transition, targets);
+            Set<TransitionTarget> historyStates = transition.getTargets();
+            if (historyStates.size() == 0) {
+                logAndThrowModelError(ERR_STATE_NO_HIST,
+                        new Object[]{getName(parent)});
+            }
+            for (TransitionTarget historyState : historyStates) {
+                if (!history.isDeep()) {
+                    // Shallow history
+                    if (!parent.getChildren().contains(historyState)) {
+                        logAndThrowModelError(ERR_STATE_BAD_SHALLOW_HIST,
+                                new Object[]{getName(parent)});
+                    }
+                } else {
+                    // Deep history
+                    if (!historyState.isDescendantOf(parent)) {
+                        logAndThrowModelError(ERR_STATE_BAD_DEEP_HIST,
+                                new Object[]{getName(parent)});
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Update this Transition object (part of post-read processing).
+     *
+     * @param transition The Transition object
+     * @param targets    The global Map of all transition targets
+     * @throws ModelException If the object model is flawed
+     */
+    private static void updateTransition(final SimpleTransition transition,
+                                         final Map<String, TransitionTarget> targets) throws ModelException {
+        String next = transition.getNext();
+        if (next == null) { // stay transition
+            return;
+        }
+        Set<TransitionTarget> tts = transition.getTargets();
+        if (tts.isEmpty()) {
+            // 'next' is a space separated list of transition target IDs
+            StringTokenizer ids = new StringTokenizer(next);
+            while (ids.hasMoreTokens()) {
+                String id = ids.nextToken();
+                TransitionTarget tt = targets.get(id);
+                if (tt == null) {
+                    logAndThrowModelError(ERR_TARGET_NOT_FOUND, new Object[]{
+                            id});
+                }
+                tts.add(tt);
+            }
+            if (tts.size() > 1) {
+                boolean legal = verifyTransitionTargets(tts);
+                if (!legal) {
+                    logAndThrowModelError(ERR_ILLEGAL_TARGETS, new Object[]{
+                            next});
+                }
+            }
+        }
+    }
+
+    /**
+     * Log an error discovered in post-read processing.
+     *
+     * @param errType The type of error
+     * @param msgArgs The arguments for formatting the error message
+     * @throws ModelException The model error, always thrown.
+     */
+    private static void logAndThrowModelError(final String errType,
+                                              final Object[] msgArgs) throws ModelException {
+        MessageFormat msgFormat = new MessageFormat(errType);
+        String errMsg = msgFormat.format(msgArgs);
+        org.apache.commons.logging.Log log = LogFactory.
+                getLog(ModelUpdater.class);
+        log.error(errMsg);
+        throw new ModelException(errMsg);
+    }
+
+    /**
+     * Get a transition target identifier for error messages. This method is
+     * only called to produce an appropriate log message in some error
+     * conditions.
+     *
+     * @param tt The <code>TransitionTarget</code> object
+     * @return The transition target identifier for the error message
+     */
+    private static String getName(final TransitionTarget tt) {
+        String name = "anonymous transition target";
+        if (tt instanceof State) {
+            name = "anonymous state";
+            if (tt.getId() != null) {
+                name = "state with ID \"" + tt.getId() + "\"";
+            }
+        } else {
+            if (tt.getId() != null) {
+                name = "transition target with ID \"" + tt.getId() + "\"";
+            }
+        }
+        return name;
+    }
+
+    /**
+     * If a transition has multiple targets, then they satisfy the following
+     * criteria:
+     * <ul>
+     * <li>No target is an ancestor of any other target on the list</li>
+     * <li>A full legal state configuration results when all ancestors and default initial descendants have been added.
+     * <br/>This means that they all must share the same least common parallel ancestor.
+     * </li>
+     * </ul>
+     *
+     * @param tts The transition targets
+     * @return Whether this is a legal configuration
+     * @see <a href=http://www.w3.org/TR/2014/CR-modula-20140313/#LegalStateConfigurations">
+     * http://www.w3.org/TR/2014/CR-modula-20140313/#LegalStateConfigurations</a>
+     */
+    private static boolean verifyTransitionTargets(final Set<TransitionTarget> tts) {
+        if (tts.size() <= 1) { // No contention
+            return true;
+        }
+
+        Set<EnterableState> parents = new HashSet<EnterableState>();
+        for (TransitionTarget tt : tts) {
+            boolean hasParallelParent = false;
+            for (int i = tt.getNumberOfAncestors() - 1; i > -1; i--) {
+                EnterableState parent = tt.getAncestor(i);
+
+                if (!parents.add(parent)) {
+                    // this TransitionTarget is an descendant of another, or shares the same Parallel region
+                    return false;
+
+                }
+            }
+        }
+        return true;
+    }
 }

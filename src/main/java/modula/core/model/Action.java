@@ -6,6 +6,9 @@ package modula.core.model;
  * @date: 2016/12/29.
  */
 
+import modula.core.ActionExecutionContext;
+import modula.core.Context;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -69,5 +72,26 @@ public abstract class Action implements NamespacePrefixesHolder,
         this.namespaces = namespaces;
     }
 
+    public final EnterableState getParentEnterableState()
+            throws ModelException {
+        if (parent == null) {
+            // global script doesn't have a EnterableState
+            return null;
+        }
+        TransitionTarget tt = parent.getParent();
+        if (tt instanceof EnterableState) {
+            return (EnterableState) tt;
+        } else if (tt instanceof History) {
+            return ((History) tt).getParent();
+        } else {
+            throw new ModelException("Unknown TransitionTarget subclass:"
+                    + tt.getClass().getName());
+        }
+    }
 
+    public abstract void execute(ActionExecutionContext exctx) throws ModelException;
+
+    protected static String getNamespacesKey() {
+        return Context.NAMESPACES_KEY;
+    }
 }

@@ -25,7 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * A PathResolver implementation that resolves against a base URL.
+ * PathResolver实现
  */
 public class URLResolver implements PathResolver, Serializable {
 
@@ -35,26 +35,23 @@ public class URLResolver implements PathResolver, Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Implementation independent log category.
+     * log
      */
     private Log log = LogFactory.getLog(PathResolver.class);
 
     /**
-     * The base URL to resolve against.
+     * baseURL
      */
     private URL baseURL = null;
 
-    /**
-     * Constructor.
-     *
-     * @param baseURL The base URL to resolve against
-     */
     public URLResolver(final URL baseURL) {
         this.baseURL = baseURL;
     }
 
     /**
-     * Uses URL(URL, String) constructor to combine URL's.
+     * 使用URL(URL, String)构造器组成 URL
+     *
+     * @see PathResolver#resolvePath(java.lang.String)
      */
     public String resolvePath(final String ctxPath) {
         URL combined;
@@ -68,6 +65,7 @@ public class URLResolver implements PathResolver, Serializable {
     }
 
     /**
+     * @see PathResolver#getResolver(java.lang.String)
      */
     public PathResolver getResolver(final String ctxPath) {
         URL combined;

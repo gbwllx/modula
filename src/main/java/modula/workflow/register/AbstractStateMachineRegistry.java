@@ -11,7 +11,7 @@ import java.util.Map;
  * @author: gubing.gb
  * @date: 2017/1/18.
  */
-public class AbstractStateMachineRegistry {
+public class AbstractStateMachineRegistry{
     protected final Map<String, StateMachineBuildContext> configs = new HashMap<String, StateMachineBuildContext>();
 
     public StateMachine get(String id) {

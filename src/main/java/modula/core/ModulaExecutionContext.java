@@ -81,8 +81,8 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      * @param eventDispatcher     The event dispatcher, if null a SimpleDispatcher instance will be used
      * @param errorReporter       The error reporter, if null a SimpleErrorReporter instance will be used
      */
-    protected ModulaExecutionContext(ModulaIOProcessor externalIOProcessor, /*Evaluator evaluator,*/
-                                     EventDispatcher eventDispatcher, ErrorReporter errorReporter) {
+    public ModulaExecutionContext(ModulaIOProcessor externalIOProcessor, /*Evaluator evaluator,*/
+                                  EventDispatcher eventDispatcher, ErrorReporter errorReporter) {
         this.externalIOProcessor = externalIOProcessor;
         //this.evaluator = evaluator;
         this.eventdispatcher = eventDispatcher != null ? eventDispatcher : new SimpleDispatcher();
@@ -123,10 +123,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
     }
 
     /**
-     * Initialize method which will cancel all current active Invokers, clear the internal event queue and mark the
-     * state machine process as running (again).
-     *
-     * @throws ModelException if the state machine instance failed to initialize.
+     * 清空Invoker, 清空内部实践队列，重启状态机实例
      */
     public void initialize() throws ModelException {
         running = false;

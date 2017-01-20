@@ -14,46 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package modula.core.invoke;
+package modula.core;
+
+import modula.core.model.ModelException;
+import modula.core.model.Modula;
 
 /**
- * invoke异常
+ * 算法语义
  */
-public class InvokerException extends Exception {
+public interface ModulaSemantics {
 
     /**
-     * Serial version UID.
+     * 暂时不用
      */
-    private static final long serialVersionUID = 1L;
+    Modula normalizeStateMachine(final Modula input, final ErrorReporter errRep);
 
     /**
-     * @see Exception#Exception()
+     * 状态机第一步
      */
-    public InvokerException() {
-        super();
-    }
+    void firstStep(final ModulaExecutionContext exctx) throws ModelException;
 
     /**
-     * @see Exception#Exception(String)
+     * 状态机执行下一步
      */
-    public InvokerException(final String message) {
-        super(message);
-    }
+    void nextStep(final ModulaExecutionContext exctx, final TriggerEvent event) throws ModelException;
 
     /**
-     * @see Exception#Exception(Throwable)
+     * 状态机执行最后一步
      */
-    public InvokerException(final Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * @see Exception#Exception(String, Throwable)
-     */
-    public InvokerException(final String message,
-                            final Throwable cause) {
-        super(message, cause);
-    }
-
+    void finalStep(final ModulaExecutionContext exctx) throws ModelException;
 }
-

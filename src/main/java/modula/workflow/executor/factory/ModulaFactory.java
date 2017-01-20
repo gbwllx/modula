@@ -1,8 +1,11 @@
 package modula.workflow.executor.factory;
 
 
+import modula.core.model.ModelException;
 import modula.core.model.Modula;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.util.Map;
 
 
@@ -17,6 +20,6 @@ public interface ModulaFactory {
      *
      * @param actionMap 状态机绑定的action，可以为null
      */
-    Modula createModula(Map<String, Class> actionMap);
+    Modula createModula(Map<String, Class> actionMap) throws ModelException, XMLStreamException, IOException;
 }
 

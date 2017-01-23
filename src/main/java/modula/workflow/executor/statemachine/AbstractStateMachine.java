@@ -13,15 +13,22 @@ import modula.workflow.executor.context.WorkflowContext;
  */
 public class AbstractStateMachine {
     protected final Modula modula;
-    protected final ModulaExecutor executor;
+    protected final ExtendedModulaExecutor executor;
+    protected volatile boolean initialized;
 
     public AbstractStateMachine(Modula modula) {
         this.modula = modula;
-        this.executor = new ModulaExecutor();
+        this.executor = new ExtendedModulaExecutor();
         try {
             this.executor.setStateMachine(this.modula);
         } catch (ModelException e) {
             e.printStackTrace();
+        }
+    }
+
+    protected class ExtendedModulaExecutor extends ModulaExecutor {
+        public void initialize() {
+            initialized = true;
         }
     }
 }

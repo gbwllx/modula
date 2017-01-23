@@ -200,14 +200,12 @@ public class ModulaSemanticsImpl implements ModulaSemantics {
         Set<History> historyTargets = new HashSet<History>();
         Set<EnterableState> entrySet = new HashSet<EnterableState>();
         for (SimpleTransition st : step.getTransitList()) {
-            if (st != null) {//TODO 这个现象很神奇，查一下
-                for (TransitionTarget tt : st.getTargets()) {
-                    if (tt instanceof EnterableState) {
-                        entrySet.add((EnterableState) tt);
-                    } else {
-                        // History
-                        historyTargets.add((History) tt);
-                    }
+            for (TransitionTarget tt : st.getTargets()) {
+                if (tt instanceof EnterableState) {
+                    entrySet.add((EnterableState) tt);
+                } else {
+                    // History
+                    historyTargets.add((History) tt);
                 }
             }
         }
@@ -218,11 +216,9 @@ public class ModulaSemanticsImpl implements ModulaSemantics {
             addDescendantStatesToEnter(exctx, step, h);
         }
         for (SimpleTransition st : step.getTransitList()) {
-            if (st != null) {//TODO 这个现象很神奇
-                TransitionalState ancestor = st.getTransitionDomain();
-                for (TransitionTarget tt : st.getTargets()) {
-                    addAncestorStatesToEnter(exctx, step, tt, ancestor);
-                }
+            TransitionalState ancestor = st.getTransitionDomain();
+            for (TransitionTarget tt : st.getTargets()) {
+                addAncestorStatesToEnter(exctx, step, tt, ancestor);
             }
         }
     }
@@ -670,6 +666,7 @@ public class ModulaSemanticsImpl implements ModulaSemantics {
                 String invokeId = exctx.setInvoker(i, inv);
                 inv.setInvokeId(invokeId);
                 inv.setParentIOProcessor(exctx.getExternalIOProcessor());
+
                 try {
                     inv.invoke(source, args);
                 } catch (InvokerException ie) {

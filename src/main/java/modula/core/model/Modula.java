@@ -171,4 +171,12 @@ public class Modula implements Serializable, LifeCycle, Observable, NamespacePre
     public final String generateTransitionTargetId() {
         return GENERATED_TT_ID_PREFIX + ttNextId++;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

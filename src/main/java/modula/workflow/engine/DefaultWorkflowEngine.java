@@ -21,7 +21,7 @@ public class DefaultWorkflowEngine implements WorkflowEngine {
             throw new RuntimeException("create stateMachine error, stateMachine=" + stateMachine);
         }
         try {
-            stateMachine.start();
+            stateMachine.start(context);
         } catch (Exception e) {
             e.printStackTrace();
         }

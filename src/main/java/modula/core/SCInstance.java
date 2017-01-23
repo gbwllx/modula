@@ -16,6 +16,7 @@
  */
 package modula.core;
 
+import modula.core.env.SimpleContext;
 import modula.core.model.*;
 import org.w3c.dom.Node;
 
@@ -36,11 +37,6 @@ public class SCInstance implements Serializable {
      * 没有设置状态机错误
      */
     private static final String ERR_NO_STATE_MACHINE = "SCInstance: State machine not set";
-
-    /**
-     * 没有设置Evaluator错误
-     */
-    private static final String ERR_NO_EVALUATOR = "SCInstance: Evaluator not set";
 
     /**
      * 没有设置errorReporter错误
@@ -66,11 +62,6 @@ public class SCInstance implements Serializable {
      * The SCXML I/O Processor for the internal event queue
      */
     private transient ModulaIOProcessor internalIOProcessor;
-
-    /**
-     * The Evaluator used for this state machine instance.
-     */
-    //private transient Evaluator evaluator;
 
     /**
      * The error reporter.
@@ -105,7 +96,6 @@ public class SCInstance implements Serializable {
     protected SCInstance(final ModulaIOProcessor internalIOProcessor, /*final Evaluator evaluator,*/
                          final ErrorReporter errorReporter) {
         this.internalIOProcessor = internalIOProcessor;
-        //this.evaluator = evaluator;
         this.errorReporter = errorReporter;
         this.currentStatus = new Status();
     }
@@ -117,9 +107,6 @@ public class SCInstance implements Serializable {
         if (stateMachine == null) {
             throw new ModelException(ERR_NO_STATE_MACHINE);
         }
-        //if (evaluator == null) {
-        //    throw new ModelException(ERR_NO_EVALUATOR);
-        //}
         if (errorReporter == null) {
             throw new ModelException(ERR_NO_ERROR_REPORTER);
         }
@@ -139,7 +126,6 @@ public class SCInstance implements Serializable {
      * 分离状态机，使能够序列化，分离errorReporte，eveluator等
      */
     protected void detach() {
-        //this.evaluator = null;
         this.errorReporter = null;
     }
 
@@ -151,29 +137,6 @@ public class SCInstance implements Serializable {
     protected void setInternalIOProcessor(ModulaIOProcessor internalIOProcessor) {
         this.internalIOProcessor = internalIOProcessor;
     }
-
-    /**
-     * Set or re-attach the evaluator
-     * <p>
-     * If this state machine instance has been initialized before, it will be initialized again, destroying all existing
-     * state!
-     * </p>
-     *
-     * @param evaluator The evaluator for this state machine instance.
-     * @throws ModelException if an attempt is made to set a null value for the evaluator
-     */
-//    protected void setEvaluator(Evaluator evaluator) throws ModelException {
-//        if (evaluator == null) {
-//            throw new ModelException(ERR_NO_EVALUATOR);
-//        }
-//        if (this.evaluator != null && initialized) {
-//            this.evaluator = evaluator;
-//            // change of evaluator after initialization: re-initialize
-//            initialize();
-//        } else {
-//            this.evaluator = evaluator;
-//        }
-//    }
 
     /**
      * Set or re-attach the error reporter
@@ -277,9 +240,9 @@ public class SCInstance implements Serializable {
      * @return The root context.
      */
     public Context getRootContext() {
-//        if (rootContext == null && evaluator != null) {
-//            rootContext = evaluator.newContext(null);
-//        }
+        if (rootContext == null) {
+            rootContext = new SimpleContext(rootContext);
+        }
         return rootContext;
     }
 
@@ -292,10 +255,10 @@ public class SCInstance implements Serializable {
         this.rootContext = context;
         // force initialization of rootContext
         getRootContext();
-//        if (systemContext != null) {
-//            // re-parent the system context
-//            systemContext.setSystemContext(evaluator.newContext(rootContext));
-//        }
+        if (systemContext != null) {
+            // re-parent the system context
+            systemContext.setSystemContext(new SimpleContext(rootContext));
+        }
     }
 
     /**
@@ -308,10 +271,10 @@ public class SCInstance implements Serializable {
             // force initialization of rootContext
             getRootContext();
             if (rootContext != null) {
-                // = new ModulaSystemContext(evaluator.newContext(rootContext));
+                systemContext = new ModulaSystemContext(new SimpleContext(rootContext));
                 systemContext.getContext().set(ModulaSystemContext.SESSIONID_KEY, UUID.randomUUID().toString());
-                //String _name = stateMachine != null && stateMachine.getName() != null ? stateMachine.getName() : "";
-                //systemContext.getContext().set(ModulaSystemContext.SCXML_NAME_KEY, _name);
+                String _name = stateMachine != null && stateMachine.getName() != null ? stateMachine.getName() : "";
+                systemContext.getContext().set(ModulaSystemContext.SCXML_NAME_KEY, _name);
             }
         }
         return systemContext != null ? systemContext.getContext() : null;
@@ -325,7 +288,7 @@ public class SCInstance implements Serializable {
             // force initialization of systemContext
             getSystemContext();
             if (systemContext != null) {
-                //globalContext = evaluator.newContext(systemContext);
+                globalContext = new SimpleContext(systemContext);
             }
         }
         return globalContext;
@@ -344,9 +307,9 @@ public class SCInstance implements Serializable {
             if (parent == null) {
                 // docroot
                 //TODO
-                //context = evaluator.newContext(getGlobalContext());
+                context = new SimpleContext(getGlobalContext());
             } else {
-                //context = evaluator.newContext(getContext(parent));
+                context = new SimpleContext(getContext(parent));
             }
             if (state instanceof TransitionalState) {
                 Datamodel datamodel = ((TransitionalState) state).getDatamodel();

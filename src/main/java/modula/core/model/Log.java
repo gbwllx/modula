@@ -80,10 +80,8 @@ public class Log extends Action {
     public void execute(ActionExecutionContext exctx) throws ModelException {
         //TODO
         Context ctx = exctx.getContext(getParentEnterableState());
-        ctx.setLocal(getNamespacesKey(), getNamespaces());
+        //ctx.setLocal(getNamespacesKey(), getNamespaces());
         exctx.getAppLog().info(label + ": " + expr);
-        logger.info(expr);
-        System.out.println(expr);
-        ctx.setLocal(getNamespacesKey(), null);
+        //ctx.setLocal(getNamespacesKey(), null);
     }
 }

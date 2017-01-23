@@ -18,7 +18,6 @@
         <appender-ref ref="stdout"/>
     </logger>
 
-
     <logger name="modula.workflow.listener.DefaultWorkflowListener" additivity="false">
         <level value="INFO"/>
         <appender-ref ref="stdout"/>

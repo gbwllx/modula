@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
      http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="workflow" class="modula.workflow.engine.DefaultWorkflowEngine">
+    <bean id="workflow" class="modula.engine.DefaultWorkflowEngine">
         <property name="registry" ref="registry"/>
         <!-- 设置一些全局变量 (所有流程共享)-->
         <property name="globals">
             <map>
-                <entry key="testKey" value="test" />
+                <entry key="testKey" value="test"/>
             </map>
         </property>
     </bean>
 
-    <bean id="registry" class="modula.workflow.register.DefaultStateMachineRegistry">
+    <bean id="registry" class="modula.register.DefaultStateMachineRegistry">
     </bean>
 
-    <bean id="modula" class="modula.workflow.executor.factory.WorkflowSpringFactoryBean">
+    <bean id="modula" class="modula.executor.factory.WorkflowSpringFactoryBean">
         <property name="path" value="modula/workflow.xml"/>
         <property name="listener">
-            <bean class="modula.workflow.listener.DefaultWorkflowListener"/>
+            <bean class="modula.listener.DefaultWorkflowListener"/>
         </property>
     </bean>
 

@@ -13,12 +13,12 @@
         <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="modula.core.ModulaExecutionContext" additivity="false">
+    <logger name="modula.executor.core.context.ModulaExecutionContext" additivity="false">
         <level value="INFO"/>
         <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="modula.workflow.listener.DefaultWorkflowListener" additivity="false">
+    <logger name="modula.listener.DefaultWorkflowListener" additivity="false">
         <level value="INFO"/>
         <appender-ref ref="stdout"/>
     </logger>

@@ -1,8 +1,8 @@
 package modula.test;
 
 import modula.engine.DefaultWorkflowEngine;
-import modula.executor.event.WorkflowEvent;
-import modula.executor.context.WorkflowContext;
+import modula.engine.event.WorkflowEvent;
+import modula.engine.context.WorkflowContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**

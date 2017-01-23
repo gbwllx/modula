@@ -1,6 +1,6 @@
-package modula.register;
+package modula.spring;
 
-import modula.executor.context.StateMachineBuildContext;
+import modula.engine.context.StateMachineBuildContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;

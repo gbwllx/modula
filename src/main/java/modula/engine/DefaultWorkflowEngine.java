@@ -1,8 +1,8 @@
 package modula.engine;
 
-import modula.executor.context.WorkflowContext;
+import modula.engine.context.WorkflowContext;
 import modula.executor.statemachine.StateMachine;
-import modula.register.DefaultStateMachineRegistry;
+import modula.spring.DefaultStateMachineRegistry;
 
 import java.util.Map;
 

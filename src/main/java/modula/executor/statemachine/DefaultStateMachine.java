@@ -1,8 +1,8 @@
 package modula.executor.statemachine;
 
 
-import modula.executor.event.WorkflowEvent;
-import modula.executor.context.WorkflowContext;
+import modula.engine.event.WorkflowEvent;
+import modula.engine.context.WorkflowContext;
 import modula.listener.ModulaListener;
 import modula.executor.core.event.TriggerEvent;
 import modula.parser.model.EnterableState;

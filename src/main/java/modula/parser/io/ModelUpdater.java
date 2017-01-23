@@ -23,7 +23,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 /**
- * ModelUpdater用于检查状态机的定义是否正确
+ * ModelUpdater用于检查状态机的定义是否正确，处理modula model以方便executor执行
  */
 final class ModelUpdater {
 
@@ -125,13 +125,7 @@ final class ModelUpdater {
      */
 
     /**
-     * <p>Update the Modula object model and make it ModulaExecutor ready.
-     * This is part of post-read processing, and sets up the necessary
-     * object references throughtout the Modula object model for the parsed
-     * document.</p>
-     *
-     * @param modula The Modula object (output from ModulaReader)
-     * @throws ModelException If the object model is flawed
+     * 更新Modula对象
      */
     static void updateModula(final Modula modula) throws ModelException {
         initDocumentOrder(modula.getChildren(), 1);
@@ -167,12 +161,7 @@ final class ModelUpdater {
     }
 
     /**
-     * Initialize all DocumentOrder instances (EnterableState or Transition)
-     * by iterating them in document order setting their document order value.
-     *
-     * @param states    The list of children states of a parent TransitionalState or the Modula document itself
-     * @param nextOrder The next to be used order value
-     * @return Returns the next to be used order value
+     * 初始化文档排序
      */
     private static int initDocumentOrder(final List<EnterableState> states, int nextOrder) {
         for (EnterableState state : states) {
@@ -189,12 +178,7 @@ final class ModelUpdater {
     }
 
     /**
-     * Initialize all Observable instances in the Modula document
-     * by iterating them in document order and seeding them with a unique obeservable id.
-     *
-     * @param states           The list of children states of a parent TransitionalState or the Modula document itself
-     * @param nextObservableId The next observable id sequence value to be used
-     * @return Returns the next to be used observable id sequence value
+     * 初始化观察者
      */
     private static int initObservables(final List<EnterableState> states, int nextObservableId) {
         for (EnterableState es : states) {
@@ -223,12 +207,7 @@ final class ModelUpdater {
     }
 
     /**
-     * Update this State object (part of post-read processing).
-     * Also checks for any errors in the document.
-     *
-     * @param state   The State object
-     * @param targets The global Map of all transition targets
-     * @throws ModelException If the object model is flawed
+     * 更新state
      */
     private static void updateState(final State state, final Map<String, TransitionTarget> targets)
             throws ModelException {
@@ -292,12 +271,7 @@ final class ModelUpdater {
     }
 
     /**
-     * Update this History object (part of post-read processing).
-     *
-     * @param history The History object
-     * @param targets The global Map of all transition targets
-     * @param parent  The parent TransitionalState for this History
-     * @throws ModelException If the object model is flawed
+     * 更新history节点
      */
     private static void updateHistory(final History history,
                                       final Map<String, TransitionTarget> targets,
@@ -333,11 +307,7 @@ final class ModelUpdater {
     }
 
     /**
-     * Update this Transition object (part of post-read processing).
-     *
-     * @param transition The Transition object
-     * @param targets    The global Map of all transition targets
-     * @throws ModelException If the object model is flawed
+     * 更新transition目标
      */
     private static void updateTransition(final SimpleTransition transition,
                                          final Map<String, TransitionTarget> targets) throws ModelException {
@@ -369,11 +339,7 @@ final class ModelUpdater {
     }
 
     /**
-     * Log an error discovered in post-read processing.
-     *
-     * @param errType The type of error
-     * @param msgArgs The arguments for formatting the error message
-     * @throws ModelException The model error, always thrown.
+     * 打日志
      */
     private static void logAndThrowModelError(final String errType,
                                               final Object[] msgArgs) throws ModelException {
@@ -385,14 +351,6 @@ final class ModelUpdater {
         throw new ModelException(errMsg);
     }
 
-    /**
-     * Get a transition target identifier for error messages. This method is
-     * only called to produce an appropriate log message in some error
-     * conditions.
-     *
-     * @param tt The <code>TransitionTarget</code> object
-     * @return The transition target identifier for the error message
-     */
     private static String getName(final TransitionTarget tt) {
         String name = "anonymous transition target";
         if (tt instanceof State) {
@@ -409,19 +367,8 @@ final class ModelUpdater {
     }
 
     /**
-     * If a transition has multiple targets, then they satisfy the following
-     * criteria:
-     * <ul>
-     * <li>No target is an ancestor of any other target on the list</li>
-     * <li>A full legal state configuration results when all ancestors and default initial descendants have been added.
-     * <br/>This means that they all must share the same least common parallel ancestor.
-     * </li>
-     * </ul>
-     *
-     * @param tts The transition targets
-     * @return Whether this is a legal configuration
-     * @see <a href=http://www.w3.org/TR/2014/CR-modula-20140313/#LegalStateConfigurations">
-     * http://www.w3.org/TR/2014/CR-modula-20140313/#LegalStateConfigurations</a>
+     * 一个transition有多个目标target，需要遵守以下原则：
+     * 没有一个target是其他target的祖先
      */
     private static boolean verifyTransitionTargets(final Set<TransitionTarget> tts) {
         if (tts.size() <= 1) { // No contention

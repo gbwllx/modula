@@ -1,6 +1,6 @@
-package modula.support.factory;
+package modula.spring.factory;
 
-import modula.executor.context.StateMachineBuildContext;
+import modula.engine.context.StateMachineBuildContext;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.util.ClassUtils;
 

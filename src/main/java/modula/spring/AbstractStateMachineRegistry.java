@@ -1,7 +1,7 @@
-package modula.register;
+package modula.spring;
 
 import modula.executor.statemachine.StateMachine;
-import modula.executor.context.StateMachineBuildContext;
+import modula.engine.context.StateMachineBuildContext;
 
 import java.util.HashMap;
 import java.util.Map;

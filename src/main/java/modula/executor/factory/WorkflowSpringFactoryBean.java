@@ -1,6 +1,6 @@
 package modula.executor.factory;
 
-import modula.executor.context.StateMachineBuildContext;
+import modula.engine.context.StateMachineBuildContext;
 import modula.listener.DefaultWorkflowListener;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.util.ClassUtils;

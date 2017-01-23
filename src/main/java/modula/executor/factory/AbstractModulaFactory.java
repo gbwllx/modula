@@ -3,7 +3,7 @@ package modula.executor.factory;
 import modula.parser.io.ModulaReader;
 import modula.parser.model.Action;
 import modula.parser.model.CustomAction;
-import modula.support.config.Configuration;
+import modula.executor.factory.config.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;

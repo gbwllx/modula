@@ -1,4 +1,4 @@
-package modula.support.config;
+package modula.executor.factory.config;
 
 import modula.parser.model.CustomAction;
 import org.apache.commons.beanutils.ConvertUtils;

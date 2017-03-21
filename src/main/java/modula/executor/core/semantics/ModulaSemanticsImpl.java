@@ -1,6 +1,8 @@
 package modula.executor.core.semantics;
 
 
+import modula.executor.core.SCInstance;
+import modula.executor.core.Status;
 import modula.executor.core.context.*;
 import modula.executor.core.event.TriggerEvent;
 import modula.executor.core.invoke.Invoker;

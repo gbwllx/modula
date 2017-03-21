@@ -16,10 +16,9 @@
  */
 package modula.executor.core.reporter;
 
-import modula.executor.core.reporter.ErrorReporter;
+import modula.executor.core.semantics.ErrorConstants;
 import modula.parser.env.LogUtils;
 import modula.parser.model.*;
-import modula.executor.core.semantics.ErrorConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

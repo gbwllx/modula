@@ -1,6 +1,6 @@
 package modula.parser.model;
 
-import modula.lifecycle.LifeCycle;
+import modula.lifecycle.Lifecycle;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.Map;
  * @author: gubing.gb
  * @date: 2016/12/30.
  */
-public class Modula implements Serializable, LifeCycle, Observable, NamespacePrefixesHolder {
+public class Modula implements Serializable, Lifecycle, Observable, NamespacePrefixesHolder {
     /**
      * Modula 版本号
      */

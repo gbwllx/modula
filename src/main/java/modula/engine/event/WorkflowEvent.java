@@ -1,7 +1,7 @@
 package modula.engine.event;
 
 /**
- * @description:
+ * @description: 流程事件封装
  * @author: gubing.gb
  * @date: 2017/1/19.
  */

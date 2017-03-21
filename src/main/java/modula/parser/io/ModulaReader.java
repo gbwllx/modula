@@ -4,6 +4,8 @@ import modula.parser.env.URLResolver;
 import modula.parser.model.*;
 import modula.parser.PathResolver;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.*;
@@ -17,6 +19,8 @@ import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.MessageFormat;
@@ -67,12 +71,12 @@ public final class ModulaReader {
 //     */
 //    private static final String ERR_NULL_SRC = "Cannot parse null Source";
 //
-//    /**
-//     * Action定义错误
-//     */
-//    private static final String ERR_CUSTOM_ACTION_TYPE = "Custom actions list"
-//            + " contained unknown object, class not a Commons Modula Action class subtype: ";
-//
+    /**
+     * Action定义错误
+     */
+    private static final String ERR_CUSTOM_ACTION_TYPE = "Custom actions list"
+            + " contained unknown object, class not a Commons Modula Action class subtype: ";
+
 //    /**
 //     * 解析DOM树错误
 //     */
@@ -523,8 +527,24 @@ public final class ModulaReader {
                     nsURI = reader.getNamespaceURI();
                     name = reader.getLocalName();
                     if (XMLNS_MODULA.equals(nsURI)) {
-                        if (ELEM_LOG.equals(name)) {
-                            readLog(reader, configuration, executable);
+                        if (XMLNS_MODULA.equals(nsURI)) {
+                            if (ELEM_LOG.equals(name)) {
+                                readLog(reader, configuration, executable);
+                            } else {
+                                reportIgnoredElement(reader, configuration, end, nsURI, name);
+                            }
+                        }
+                    } else {
+                        CustomAction customAction = null;
+                        if (!configuration.customActions.isEmpty()) {
+                            for (CustomAction ca : configuration.customActions) {
+                                if (ca.getNamespaceURI().equals(nsURI) && ca.getLocalName().equals(name)) {
+                                    customAction = ca;
+                                }
+                            }
+                        }
+                        if (customAction != null) {
+                            readCustomAction(reader, configuration, customAction, executable);
                         } else {
                             reportIgnoredElement(reader, configuration, end, nsURI, name);
                         }
@@ -541,6 +561,64 @@ public final class ModulaReader {
                 default:
             }
         }
+    }
+
+    private static void readCustomAction(final XMLStreamReader reader, final Configuration configuration,
+                                         final CustomAction customAction, final Executable executable)
+            throws XMLStreamException {
+
+        // Instantiate custom action
+        Object actionObject = null;
+        String className = customAction.getActionClass().getName();
+        ClassLoader cl = configuration.customActionClassLoader;
+        if (configuration.useContextClassLoaderForCustomActions) {
+            cl = Thread.currentThread().getContextClassLoader();
+        }
+        if (cl == null) {
+            cl = ModulaReader.class.getClassLoader();
+        }
+        Class<?> clazz = null;
+        try {
+            clazz = cl.loadClass(className);
+            actionObject = clazz.newInstance();
+        } catch (ClassNotFoundException cnfe) {
+            throw new XMLStreamException("Cannot find custom action class:" + className, cnfe);
+        } catch (IllegalAccessException iae) {
+            throw new XMLStreamException("Cannot access custom action class:" + className, iae);
+        } catch (InstantiationException ie) {
+            throw new XMLStreamException("Cannot instantiate custom action class:" + className, ie);
+        }
+        if (!(actionObject instanceof Action)) {
+            throw new IllegalArgumentException(ERR_CUSTOM_ACTION_TYPE + className);
+        }
+
+        // Set the attribute values as properties
+        Action action = (Action) actionObject;
+        for (int i = 0; i < reader.getAttributeCount(); i++) {
+            String name = reader.getAttributeLocalName(i);
+            String value = reader.getAttributeValue(i);
+            String setter = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+            Method method = null;
+            try {
+                method = clazz.getMethod(setter, String.class);
+                method.invoke(action, value);
+            } catch (NoSuchMethodException nsme) {
+                throw new XMLStreamException("No setter in class:" + className + ", for string property:" + name,
+                        nsme);
+            } catch (InvocationTargetException ite) {
+                throw new XMLStreamException("Exception calling setter for string property:" + name + " in class:"
+                        + className, ite);
+            } catch (IllegalAccessException iae) {
+                throw new XMLStreamException("Cannot access setter for string property:" + name + " in class:"
+                        + className, iae);
+            }
+        }
+
+
+        // Wire in the action and add to parent
+        readNamespaces(configuration, action);
+        action.setParent(executable);
+        executable.addAction(action);
     }
 
     private static void readLog(final XMLStreamReader reader, final Configuration configuration,

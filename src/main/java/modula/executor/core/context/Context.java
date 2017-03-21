@@ -19,8 +19,7 @@ package modula.executor.core.context;
 import java.util.Map;
 
 /**
- * A Context or &quot;scope&quot; for storing variables; usually tied to
- * a SCXML root or State object.
+ * 上下文接口
  */
 public interface Context {
 
@@ -34,7 +33,7 @@ public interface Context {
      * The method searches the chain of parent Contexts for variable
      * existence.
      *
-     * @param name The variable name
+     * @param name  The variable name
      * @param value The variable value
      */
     void set(String name, Object value);
@@ -44,7 +43,7 @@ public interface Context {
      * The method allows to shaddow a variable of the same name up the
      * Context chain.
      *
-     * @param name The variable name
+     * @param name  The variable name
      * @param value The variable value
      */
     void setLocal(String name, Object value);

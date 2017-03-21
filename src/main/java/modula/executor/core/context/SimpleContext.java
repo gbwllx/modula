@@ -1,7 +1,5 @@
-package modula.parser.env;
+package modula.executor.core.context;
 
-import modula.executor.core.context.Context;
-import modula.executor.core.context.ModulaSystemContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -10,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @description:
+ * @description: {@link Context}的简单实现
  * @author: gubing.gb
  * @date: 2017/1/23.
  */

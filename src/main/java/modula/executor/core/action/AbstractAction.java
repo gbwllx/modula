@@ -12,6 +12,6 @@ import modula.parser.model.Action;
 public class AbstractAction extends Action {
     @Override
     public void execute(ActionExecutionContext exctx) throws ModelException {
-
+        System.out.println("abstract");
     }
 }

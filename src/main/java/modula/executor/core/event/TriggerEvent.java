@@ -19,12 +19,7 @@ package modula.executor.core.event;
 import java.io.Serializable;
 
 /**
- * A class representing an event. Specific event types have been
- * defined in reference to SCXML.
- *
- * <b>NOTE:</b> Instances are {@link Serializable} as long as the associated
- * payload, if any, is {@link Serializable}.
- *
+ * 事件定义
  */
 public class TriggerEvent implements Serializable {
 

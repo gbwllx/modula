@@ -12,13 +12,31 @@
                 <entry key="testKey" value="test"/>
             </map>
         </property>
+        <property name="executor" ref="executor"/>
     </bean>
 
     <bean id="registry" class="modula.spring.DefaultStateMachineRegistry">
     </bean>
 
+    <bean id="executor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="threadGroupName" value="workflowExecutor"/>
+        <property name="threadNamePrefix" value="workflow-task"/>
+
+        <property name="corePoolSize" value="50"/>
+        <property name="keepAliveSeconds" value="300"/>
+        <property name="maxPoolSize" value="200"/>
+        <property name="queueCapacity" value="100"/>
+    </bean>
+
     <bean id="modula" class="modula.executor.factory.WorkflowSpringFactoryBean">
         <property name="path" value="modula/workflow.xml"/>
+        <property name="action">
+            <map>
+                <entry key="makeOrder">
+                    <value type="java.lang.Class">modula.test.TestAction</value>
+                </entry>
+            </map>
+        </property>
         <property name="listener">
             <bean class="modula.listener.DefaultWorkflowListener"/>
         </property>

@@ -24,18 +24,13 @@ public abstract class AbstractModulaFactory implements ModulaFactory {
         for (Map.Entry<String, Class> entry : actionMap.entrySet()) {
             if (entry.getKey() != null && entry.getValue() != null) {
                 Class actionClass = entry.getValue();
-                if (!Action.class.isAssignableFrom(actionClass)) {
-                    actionClass = createProxy(actionClass);
-                }
+
                 customActions.add(new CustomAction(Configuration.DEFAULT_NAMESAPCE, entry.getKey(), actionClass));
             }
         }
         return new ModulaReader.Configuration(null, null, customActions);
     }
 
-    protected Class createProxy(Class actionClass) {
-        //return SimpleActionProxy.createProxy(actionClass);
-        return null;
-    }
+
 
 }

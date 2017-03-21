@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package modula.executor.core.context;
+package modula.executor.core;
 
+import modula.executor.core.context.Context;
+import modula.executor.core.context.ModulaExecutionContext;
 import modula.executor.core.dispatcher.EventDispatcher;
 import modula.executor.core.event.TriggerEvent;
 import modula.executor.core.invoke.Invoker;

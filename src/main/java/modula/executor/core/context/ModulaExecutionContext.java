@@ -1,5 +1,6 @@
 package modula.executor.core.context;
 
+import modula.executor.core.SCInstance;
 import modula.executor.core.reporter.ErrorReporter;
 import modula.executor.core.dispatcher.EventDispatcher;
 import modula.executor.core.event.TriggerEvent;
@@ -164,7 +165,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      * @param stateMachine The state machine to set
      * @throws ModelException if attempting to set a null value or the state machine instance failed to re-initialize
      */
-    protected void setStateMachine(Modula stateMachine) throws ModelException {
+    public void setStateMachine(Modula stateMachine) throws ModelException {
         scInstance.setStateMachine(stateMachine);
     }
 
@@ -192,7 +193,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      * @param evaluator The evaluator to set
      * @throws ModelException if attempting to set a null value or the state machine instance failed to re-initialize
      */
-    //protected void setEvaluator(Evaluator evaluator) throws ModelException {
+    //public void setEvaluator(Evaluator evaluator) throws ModelException {
     //    scInstance.setEvaluator(evaluator);
     //    this.evaluator = evaluator;
     //}
@@ -209,7 +210,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      *
      * @param errorReporter The error reporter to set, if null a SimpleErrorReporter instance will be used instead
      */
-    protected void setErrorReporter(ErrorReporter errorReporter) {
+    public void setErrorReporter(ErrorReporter errorReporter) {
         this.errorReporter = errorReporter != null ? errorReporter : new SimpleErrorReporter();
         try {
             scInstance.setErrorReporter(errorReporter);
@@ -231,7 +232,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      *
      * @param eventdispatcher The event dispatcher to set, if null a SimpleDispatcher instance will be used instead
      */
-    protected void setEventdispatcher(EventDispatcher eventdispatcher) {
+    public void setEventdispatcher(EventDispatcher eventdispatcher) {
         this.eventdispatcher = eventdispatcher != null ? eventdispatcher : new SimpleDispatcher();
     }
 
@@ -250,7 +251,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      *
      * @return the detached instance
      */
-    protected SCInstance detachInstance() {
+    public SCInstance detachInstance() {
         SCInstance instance = scInstance;
         scInstance.detach();
         scInstance = null;
@@ -265,7 +266,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      *
      * @param instance An previously detached SCInstance
      */
-    protected void attachInstance(SCInstance instance) {
+    public void attachInstance(SCInstance instance) {
         if (scInstance != null) {
             scInstance.detach();
         }
@@ -288,7 +289,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      * @param type         The target type (specified by "type" attribute of the invoke element).
      * @param invokerClass The Invoker class.
      */
-    protected void registerInvokerClass(final String type, final Class<? extends Invoker> invokerClass) {
+    public void registerInvokerClass(final String type, final Class<? extends Invoker> invokerClass) {
         invokerClasses.put(type, invokerClass);
     }
 
@@ -297,7 +298,7 @@ public class ModulaExecutionContext implements ModulaIOProcessor {
      *
      * @param type The target type (specified by "type" attribute of the invoke element).
      */
-    protected void unregisterInvokerClass(final String type) {
+    public void unregisterInvokerClass(final String type) {
         invokerClasses.remove(type);
     }
 

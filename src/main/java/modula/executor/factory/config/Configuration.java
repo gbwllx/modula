@@ -23,7 +23,7 @@ public abstract class Configuration implements Serializable {
     /**
      * 默认action 命名空间
      */
-    public static final String             DEFAULT_NAMESAPCE            = "http://www.alibaba-inc.com/2015/xfsm";
+    public static final String             DEFAULT_NAMESAPCE            = "http://www.alibaba-inc.com/2017/modula";
     /**
      * 全局变量前缀
      */

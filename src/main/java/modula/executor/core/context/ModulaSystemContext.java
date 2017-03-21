@@ -44,7 +44,7 @@ public class ModulaSystemContext implements Context, Serializable {
      *
      * @param systemContext the system context to set
      */
-    void setSystemContext(Context systemContext) {
+    public void setSystemContext(Context systemContext) {
         if (this.systemContext != null) {
             // replace systemContext
             systemContext.getVars().putAll(this.systemContext.getVars());
@@ -109,7 +109,7 @@ public class ModulaSystemContext implements Context, Serializable {
     /**
      * @return Returns the wrapped (modifiable) system context
      */
-    Context getContext() {
+    public Context getContext() {
         return systemContext;
     }
 }

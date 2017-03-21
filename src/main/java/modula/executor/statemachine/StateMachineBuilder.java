@@ -44,7 +44,7 @@ public class StateMachineBuilder {
 
     public StateMachine build() throws ModelException, XMLStreamException, IOException {
         verify();
-        //TODO:学到1，缓存的频繁使用
+
         Modula modula = modulaCache.get();
         if (modula == null) {
             int version = modulaCache.version.get();
@@ -53,6 +53,7 @@ public class StateMachineBuilder {
         }
 
         DefaultStateMachine stateMachine = new DefaultStateMachine(modula);
+        stateMachine.addListener(listeners.toArray(new DefaultWorkflowListener[listeners.size()]));
 
         return stateMachine;
     }

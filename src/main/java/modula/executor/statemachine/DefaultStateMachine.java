@@ -3,12 +3,11 @@ package modula.executor.statemachine;
 
 import modula.engine.event.WorkflowEvent;
 import modula.engine.context.WorkflowContext;
+import modula.executor.factory.config.Configuration;
+import modula.listener.DefaultWorkflowListener;
 import modula.listener.ModulaListener;
 import modula.executor.core.event.TriggerEvent;
-import modula.parser.model.EnterableState;
-import modula.parser.model.Modula;
-import modula.parser.model.Transition;
-import modula.parser.model.TransitionTarget;
+import modula.parser.model.*;
 
 import java.util.List;
 
@@ -22,25 +21,6 @@ public class DefaultStateMachine extends AbstractStateMachine implements StateMa
 
     public DefaultStateMachine(Modula modula) {
         super(modula);
-        this.executor.addListener(this.modula, new ModulaListener() {
-            @Override
-            public void onEntry(EnterableState state) {
-//                WorkflowContext context = get(Configuration.EXTERNAL_CONTEXT);
-//                if (context != null) {
-//                    context.setCurrentState(state.getId());
-//                }
-            }
-
-            @Override
-            public void onExit(EnterableState state) {
-
-            }
-
-            @Override
-            public void onTransition(TransitionTarget from, TransitionTarget to, Transition transition, String event) {
-
-            }
-        });
     }
 
     @Override
@@ -87,6 +67,22 @@ public class DefaultStateMachine extends AbstractStateMachine implements StateMa
         return this;
     }
 
+    public DefaultStateMachine addListener(DefaultWorkflowListener... listeners) {
+        if (listeners != null && listeners.length > 0) {
+            for (DefaultWorkflowListener listener : listeners) {
+                Observable observable = null;
+                if (listener.getId() == null || "modula".equals(listener.getId())) {
+                    observable = this.modula;
+                } else {
+                    observable = executor.getStateMachine().getTargets().get(listener.getId());
+                }
+                if (observable != null) {
+                    executor.addListener(observable, listener);
+                }
+            }
+        }
+        return this;
+    }
 
     public DefaultStateMachine set(String name, Object value) {
         executor.getRootContext().set(name, value);

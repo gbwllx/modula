@@ -1,7 +1,7 @@
 package modula.executor.statemachine;
 
 
-import modula.executor.core.context.ModulaExecutor;
+import modula.executor.core.ModulaExecutor;
 import modula.parser.model.ModelException;
 import modula.parser.model.Modula;
 

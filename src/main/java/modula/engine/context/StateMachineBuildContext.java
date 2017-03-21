@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @description:
+ * @description: 状态机创建上下文，现在主要是builder
  * @author: gubing.gb
  * @date: 2016/12/30.
  */

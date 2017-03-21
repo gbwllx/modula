@@ -1,11 +1,9 @@
 package modula.executor.core.context;
 
-import modula.executor.core.context.Context;
-import modula.executor.core.reporter.ErrorReporter;
 import modula.executor.core.dispatcher.EventDispatcher;
-import modula.executor.core.context.ModulaExecutionContext;
-import modula.parser.model.Action;
+import modula.executor.core.reporter.ErrorReporter;
 import modula.parser.ModulaIOProcessor;
+import modula.parser.model.Action;
 import modula.parser.model.EnterableState;
 import modula.parser.model.Modula;
 import org.apache.commons.logging.Log;

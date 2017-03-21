@@ -31,10 +31,10 @@ public class CustomAction {
             "Cannot define a custom Modula action with a null or empty namespace";
 
     /**
-     * Modula命名空间，TODO
+     * Modula命名空间
      */
     private static final String NAMESPACE_MODULA =
-            "http://www.w3.org/2005/07/scxml";
+            "http://localhost/2017/01/modula";
 
     /**
      * 不能使用保留命名空间NAMESPACE_MODULA错误

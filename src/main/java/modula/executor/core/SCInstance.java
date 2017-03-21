@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package modula.executor.core.context;
+package modula.executor.core;
 
+import modula.executor.core.context.Context;
+import modula.executor.core.context.ModulaSystemContext;
+import modula.executor.core.context.SimpleContext;
 import modula.executor.core.reporter.ErrorReporter;
 import modula.parser.model.*;
-import modula.parser.env.SimpleContext;
 import modula.parser.ModulaIOProcessor;
 
 import java.io.Serializable;
@@ -94,7 +96,7 @@ public class SCInstance implements Serializable {
      */
     private Context globalContext;
 
-    protected SCInstance(final ModulaIOProcessor internalIOProcessor, /*final Evaluator evaluator,*/
+    public SCInstance(final ModulaIOProcessor internalIOProcessor, /*final Evaluator evaluator,*/
                          final ErrorReporter errorReporter) {
         this.internalIOProcessor = internalIOProcessor;
         this.errorReporter = errorReporter;
@@ -104,7 +106,7 @@ public class SCInstance implements Serializable {
     /**
      * 重新初始化状态机
      */
-    protected void initialize() throws ModelException {
+    public void initialize() throws ModelException {
         if (stateMachine == null) {
             throw new ModelException(ERR_NO_STATE_MACHINE);
         }
@@ -123,7 +125,7 @@ public class SCInstance implements Serializable {
     /**
      * 分离状态机，使能够序列化，分离errorReporte，eveluator等
      */
-    protected void detach() {
+    public void detach() {
         this.errorReporter = null;
     }
 
@@ -132,7 +134,7 @@ public class SCInstance implements Serializable {
      *
      * @param internalIOProcessor
      */
-    protected void setInternalIOProcessor(ModulaIOProcessor internalIOProcessor) {
+    public void setInternalIOProcessor(ModulaIOProcessor internalIOProcessor) {
         this.internalIOProcessor = internalIOProcessor;
     }
 
@@ -142,7 +144,7 @@ public class SCInstance implements Serializable {
      * @param errorReporter The error reporter for this state machine instance.
      * @throws ModelException if an attempt is made to set a null value for the error reporter
      */
-    protected void setErrorReporter(ErrorReporter errorReporter) throws ModelException {
+    public void setErrorReporter(ErrorReporter errorReporter) throws ModelException {
         if (errorReporter == null) {
             throw new ModelException(ERR_NO_ERROR_REPORTER);
         }
@@ -166,7 +168,7 @@ public class SCInstance implements Serializable {
      * @param stateMachine The state machine for this instance
      * @throws ModelException if an attempt is made to set a null value for the state machine
      */
-    protected void setStateMachine(Modula stateMachine) throws ModelException {
+    public void setStateMachine(Modula stateMachine) throws ModelException {
         if (stateMachine == null) {
             throw new ModelException(ERR_NO_STATE_MACHINE);
         }
@@ -203,7 +205,7 @@ public class SCInstance implements Serializable {
      *
      * @param context The new root context.
      */
-    protected void setRootContext(final Context context) {
+    public void setRootContext(final Context context) {
         this.rootContext = context;
         // force initialization of rootContext
         getRootContext();

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @description:
+ * @description: 具体流程上下文，TODO：需要改造
  * @author: gubing.gb
  * @date: 2016/12/30.
  */
@@ -46,7 +46,7 @@ public class WorkflowContext {
     }
 
     public WorkflowContext setEvents(WorkflowEvent... events) {
-        if (events != null && events.length > 0){
+        if (events != null && events.length > 0) {
             this.events = new ArrayList<WorkflowEvent>();
             this.events.addAll(Arrays.asList(events));
         } else {
